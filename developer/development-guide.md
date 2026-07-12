@@ -495,7 +495,9 @@ Picker filter values may be constants or references to a field on the current re
       "delete": false
     }
   ],
-  "forms": ["SALES_OrderForm"]
+  "forms": ["SALES_OrderForm"],
+  "functions": ["SALES_PostOrder"],
+  "reports": ["SALES_OrderReport"]
 }
 ```
 

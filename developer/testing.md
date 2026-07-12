@@ -16,4 +16,4 @@ Release candidates also require a Windows updater exercise and a Docker smoke up
 
 ## Related topics
 
-[Contributing](https://github.com/emu479p01/emu-framework/blob/master/CONTRIBUTING.md) · [Dependency upgrades](dependency-upgrades.md)
+[Contributing to the framework](https://github.com/emu479p01/emu-framework/blob/master/CONTRIBUTING.md) · [Documentation repository](https://github.com/emu479p01/emu-framework-docs) · [Dependency upgrades](dependency-upgrades.md)

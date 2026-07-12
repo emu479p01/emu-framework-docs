@@ -2,7 +2,7 @@
 
 # EmuFramework Documentation
 
-Documentation for [EmuFramework](https://github.com/emu479p01/emu-framework). Each page covers one task or concept; choose the path that matches your role.
+Documentation for [EmuFramework](https://github.com/emu479p01/emu-framework), maintained in the dedicated [emu-framework-docs repository](https://github.com/emu479p01/emu-framework-docs). Each page covers one task or concept; choose the path that matches your role.
 
 ## User
 
@@ -35,3 +35,8 @@ Documentation for [EmuFramework](https://github.com/emu479p01/emu-framework). Ea
 - [Run tests](developer/testing.md)
 - [Use AI and MCP tools](developer/ai-mcp.md)
 - [Review future major dependency upgrades](developer/dependency-upgrades.md)
+
+## Contributing
+
+- [Contributing to the framework source](https://github.com/emu479p01/emu-framework/blob/master/CONTRIBUTING.md)
+- [Documentation repository](https://github.com/emu479p01/emu-framework-docs)
