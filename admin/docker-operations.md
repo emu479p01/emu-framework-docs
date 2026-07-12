@@ -14,6 +14,39 @@ docker compose pull
 
 Use `docker compose down` only when the containers and network should be removed; the named volume remains. Never add `-v` unless deleting all application data is intentional.
 
+## Verify the updater
+
+The updater is intentionally not exposed on a host port. It is reached only by the app over the Compose network:
+
+```text
+http://updater:3400
+```
+
+Check both services and their logs:
+
+```sh
+docker compose ps
+docker compose logs --tail=100 app
+docker compose logs --tail=100 updater
+```
+
+Confirm that the app, rather than only the updater, has the required settings:
+
+```sh
+docker compose exec app printenv EMU_DEPLOYMENT_MODE
+docker compose exec app printenv EMU_UPDATER_URL
+```
+
+Expected values are `docker` and `http://updater:3400`. Recreate the app after changing `.env`:
+
+```sh
+docker compose up -d --force-recreate app
+```
+
+## Docker Desktop checks
+
+When containers were created manually in Docker Desktop, verify that both containers share a user-defined network and that the app has a `/data` volume. The updater must have access to `/var/run/docker.sock`; this grants host-level Docker control and should be treated as a high-privilege component.
+
 ## Manual rollback
 
 1. Keep the verified pre-update backup.

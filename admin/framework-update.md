@@ -14,10 +14,16 @@ Install the latest stable GitHub Release while preserving apps and databases.
 
 The system creates and validates a `.emubackup` before starting. Windows verifies release SHA-256; Docker pulls the immutable GHCR version tag and restores the previous container if health checks fail.
 
+For Docker, the app contacts the internal updater service using `EMU_UPDATER_URL` and `EMU_UPDATER_TOKEN`. The updater controls Docker through the mounted Docker socket, pulls the target app image, replaces the app container, and checks its health. The updater itself does not need a published host port.
+
+The persistent `emu-data` volume is reused by the replacement container. Container rollback does not roll back database contents; keep the pre-update `.emubackup` until the new version has been verified.
+
 ## Manual fallback
 
 - Windows: run `Update.cmd`.
 - Docker: set `EMU_VERSION` to the required stable version, then run `docker compose pull app && docker compose up -d app`.
+
+If the app was created manually rather than through Compose, recreate it with `EMU_DEPLOYMENT_MODE=docker`, `EMU_UPDATER_URL=http://updater:3400`, the matching token, the same user-defined network as the updater, and the existing named `/data` volume.
 
 Updates support only forward movement to the latest stable version. Database rollback is never automatic.
 
