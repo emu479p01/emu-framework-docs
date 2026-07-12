@@ -1,5 +1,13 @@
 # Operate Docker
 
+## Audience
+
+Docker operators and framework administrators.
+
+## Prerequisites
+
+Docker Compose access to the EmuFramework installation.
+
 ## Common commands
 
 ```sh

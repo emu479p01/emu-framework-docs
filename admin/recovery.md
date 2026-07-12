@@ -1,5 +1,17 @@
 # Recover from a failed update
 
+## Purpose
+
+Return the framework to a known-good runtime while preserving evidence and database backups.
+
+## Audience
+
+Framework administrators and deployment operators.
+
+## Prerequisites
+
+Access to application logs, the previous framework version, and the latest verified backup.
+
 ## Procedure
 
 1. Record the update job error and backup path from **System Maintenance**.

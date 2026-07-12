@@ -2,6 +2,14 @@
 
 Run `pnpm emu --help` for the current command list.
 
+## Audience
+
+Developers creating source-controlled applications and metadata.
+
+## Prerequisites
+
+A configured repository root with dependencies installed.
+
 ```sh
 pnpm emu add-app <name>
 pnpm emu add-module <app> <module>

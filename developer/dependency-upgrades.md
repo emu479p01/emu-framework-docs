@@ -2,6 +2,14 @@
 
 Major upgrades are intentionally separate from framework update and documentation work.
 
+## Audience
+
+Framework maintainers and release engineers.
+
+## Prerequisites
+
+An isolated branch, current test baseline, and the migration guide for the dependency group being upgraded.
+
 | Group | Current major | Future major | Required coverage |
 |---|---:|---:|---|
 | Fastify and plugins | 4 | 5 | auth, multipart, static client, errors, maintenance APIs |

@@ -4,6 +4,14 @@
 
 Run a release without installing Node.js globally.
 
+## Audience
+
+Windows operators and framework administrators.
+
+## Prerequisites
+
+A writable Windows folder and permission to run the release launcher.
+
 ## Procedure
 
 1. Download and extract the latest release to a writable folder.

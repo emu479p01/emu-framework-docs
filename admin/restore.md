@@ -4,6 +4,14 @@
 
 Replace both databases from a verified `.emubackup` package.
 
+## Audience
+
+Framework administrators responsible for recovery.
+
+## Prerequisites
+
+A validated `.emubackup`, application stop/start access, and a copy of the current databases.
+
 ## Procedure
 
 1. Validate the package in **System Maintenance**.

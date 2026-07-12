@@ -1,5 +1,13 @@
 # Troubleshoot the system
 
+## Audience
+
+Framework administrators and deployment operators.
+
+## Prerequisites
+
+Access to application status, logs, host storage, and Docker commands when applicable.
+
 ## App does not start
 
 Check ports, free disk space, runtime versions, and logs. Windows users can run `status.cmd`; Docker users can run `docker compose ps` and `docker compose logs --tail=200`.

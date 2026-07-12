@@ -4,6 +4,14 @@
 
 Plan capacity for the SQLite business and Designer databases.
 
+## Audience
+
+Deployment operators and database administrators.
+
+## Prerequisites
+
+Host access to Docker or the Windows installation and a verified backup before storage changes.
+
 SQLite files grow automatically as records and indexes are added. There is no database-size setting to increase. Available space is controlled by the Windows disk or by the disk/VM that stores Docker volumes.
 
 ## Check Docker usage

@@ -1,10 +1,32 @@
 # Add business logic
 
-Use table hooks for record validation/defaults, events for pre/post behavior, and named actions for explicit server operations. Execute related writes inside a transaction through `DataContext`.
+## Purpose
 
-Keep validation deterministic, avoid network calls inside database transactions, and enforce authorization on the server even when the client hides an action. Test success, rejection, rollback, and concurrent behavior.
+Choose the smallest server-side mechanism that matches the behavior and keeps authorization, validation, and transactions consistent.
 
-Designer script artifacts are appropriate for supported dynamic behavior; native integrations still belong in reviewed TypeScript code.
+## Audience
+
+Application developers and reviewers.
+
+## Prerequisites
+
+An application with its tables, permissions, and metadata workflow defined.
+
+## Choose the mechanism
+
+| Behavior | Use |
+| --- | --- |
+| Record defaults or validation | [Hooks and data events](hooks-events.md) |
+| Pre/post lifecycle behavior | [Hooks and data events](hooks-events.md) |
+| Explicit user operation | [Function/action](functions.md) |
+| Several related registrations | [Script](scripts.md) |
+| Native or external integration | Reviewed TypeScript |
+
+Execute related writes inside a transaction through `DataContext`. Keep validation deterministic, avoid network calls inside database transactions, and enforce authorization on the server even when the client hides an action.
+
+## Testing
+
+Test success, rejection, rollback, unauthorized access, and concurrent behavior. See [Run tests and debug](testing.md).
 
 ## Related topics
 

@@ -2,6 +2,14 @@
 
 EmuFramework uses layered authorization. A user receives one or more **Roles**; roles contain **Duties** and duties contain **Privileges**. A role may also reference privileges directly.
 
+## Audience
+
+Developers, application administrators, and security reviewers.
+
+## Prerequisites
+
+An application with defined metadata and an understanding of its users, roles, duties, and privileges.
+
 ## Roles and privileges
 
 - **Role** is the assignment boundary for a user, such as `FW_FrameworkUser` or `FW_SystemAdminRole`.

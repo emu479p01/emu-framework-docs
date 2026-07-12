@@ -4,6 +4,14 @@
 
 Create one verified package containing business data and Designer metadata.
 
+## Audience
+
+Framework administrators.
+
+## Prerequisites
+
+Framework Administrator access and enough storage outside the application host.
+
 ## Procedure
 
 1. Open **System Maintenance** as a Framework Administrator.

@@ -4,6 +4,14 @@
 
 Open EmuFramework, sign in, and find an application page.
 
+## Audience
+
+Framework users.
+
+## Prerequisites
+
+An application URL and an account provisioned by an administrator.
+
 ## Procedure
 
 1. Open the URL supplied by your administrator.

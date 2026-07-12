@@ -4,6 +4,14 @@
 
 Set runtime values without editing application source.
 
+## Audience
+
+Deployment operators and framework administrators.
+
+## Prerequisites
+
+Access to the Windows launcher or Docker environment and permission to restart the application.
+
 ## Settings
 
 | Variable | Purpose | Default |

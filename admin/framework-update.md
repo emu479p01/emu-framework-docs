@@ -4,6 +4,24 @@
 
 Install the latest stable GitHub Release while preserving apps and databases.
 
+## Audience
+
+Framework administrators and deployment operators.
+
+## Update flow
+
+```mermaid
+flowchart TD
+    A[Verified backup] --> B[Check release and compatibility]
+    B --> C[Download Windows files or Docker image]
+    C --> D[Replace framework container/files]
+    D --> E[Health check]
+    E -->|Pass| F[Verify login, apps, and records]
+    E -->|Fail| G[Restore previous framework version]
+    G --> H[Inspect logs and recovery backup]
+    F --> I[Keep pre-update backup until verified]
+```
+
 ## Web procedure
 
 1. Sign in as a Framework Administrator.

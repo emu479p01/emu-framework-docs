@@ -4,6 +4,10 @@
 
 Run immutable EmuFramework images with persistent database storage.
 
+## Audience
+
+Docker operators and framework administrators.
+
 ## Prerequisites
 
 Docker Engine with Compose and access to `ghcr.io`.
