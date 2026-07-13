@@ -55,7 +55,7 @@ The App manifest defines the application identity, display information, dependen
 }
 ```
 
-Use the App boundary to decide what belongs together, what the application depends on, and which users can access it.
+Use the App boundary to decide what belongs together, what the application depends on, and which users can access it. `dependsOn` also determines load order: the kernel registers apps by walking the dependency graph so a dependency is always registered before any app that depends on it, and this now also governs whether a cross-app Extension is allowed (see [Extensions](extensions.md)).
 
 ## Model
 

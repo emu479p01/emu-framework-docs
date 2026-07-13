@@ -82,7 +82,9 @@ This adds a localized field to `SALES_Customer` without copying or replacing the
 - Names are stable identifiers; changing them can break references.
 - Higher-layer base artifacts can hide lower-layer definitions with the same logical identity.
 - Extensions accumulate; they do not provide a general-purpose replacement mechanism.
-- Do not depend on undocumented registration order between artifacts.
+- An Extension's layer must be strictly higher than its target's layer; the registry rejects an Extension defined at the same layer as its target.
+- Only one Extension of a given kind may target the same base artifact from the same app and Model.
+- Do not depend on undocumented registration order between artifacts. Apps are now registered following their declared `dependsOn` graph (a dependency loads before any app that depends on it), with layer and name used only to order otherwise-unrelated apps.
 - Review schema effects before applying a layer change. Additive synchronization supports new tables, fields, and indexes; destructive changes require migration and backup planning.
 
 ## Testing

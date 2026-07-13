@@ -73,7 +73,13 @@ Use file-based Extensions for reviewed, repeatable, source-controlled applicatio
 
 ## Naming, ordering, and removal
 
-Names are stable identifiers and must be unique. Do not overwrite framework files or rely on undocumented registration order. Declare dependencies explicitly, use the appropriate layer, and avoid duplicate action names. An Extension should be removable without copying the base app or leaving orphaned references.
+Names are stable identifiers and must be unique. The canonical form is `<AppPrefix>_<ModelName>_<BaseName>_Extension`; the CLI and Web Designer derive this automatically from the extending app, the source Model, and the target artifact. Extensions saved under the older `<AppPrefix>_<BaseName>_Extension` form (without the Model segment) remain supported — they are not renamed automatically — but the registry logs a legacy-name warning, and the change-set preview surfaces the same warning so it can be addressed deliberately.
+
+Only one Extension of a given kind may target the same base artifact from the same app and Model; the registry rejects a second `tableExtension`, `formExtension`, and so on for an identical `(app, model, kind, target)` combination.
+
+An Extension's `layer` must be strictly higher than the target artifact's layer — extending at the same layer as the target is rejected. When the target belongs to a different app, that dependency must be declared (directly or transitively) in the extending app's `dependsOn`; the registry now validates this at load time instead of relying on convention.
+
+Do not overwrite framework files or rely on undocumented registration order. Declare dependencies explicitly, use the appropriate layer, and avoid duplicate action names. An Extension should be removable without copying the base app or leaving orphaned references.
 
 ## Security and schema considerations
 

@@ -53,7 +53,27 @@ docker compose up -d --force-recreate app
 
 ## Docker Desktop checks
 
-When containers were created manually in Docker Desktop, verify that both containers share a user-defined network and that the app has a `/data` volume. The updater must have access to `/var/run/docker.sock`; this grants host-level Docker control and should be treated as a high-privilege component.
+When containers were created manually in Docker Desktop, verify that both containers share a user-defined network and that the app has a `/data` volume. The updater must have access to `/var/run/docker.sock`; this grants host-level Docker control and should be treated as a high-privilege component. See [Docker installation](docker-install.md) for the exact connectivity test command for manually created containers.
+
+## Update status states
+
+A successful update moves through this sequence, tracked in the file set by `EMU_UPDATE_STATE_PATH` (default `/data/update-status.json`):
+
+```text
+pending -> running -> restarting -> succeeded
+```
+
+## Diagnose `fetch failed` during update checks
+
+Common causes, roughly in order of likelihood:
+
+- The app and updater containers are not on the same Docker network.
+- The updater container is missing the network alias `updater`.
+- The app's `EMU_UPDATER_URL` is not `http://updater:3400`.
+- `EMU_UPDATER_TOKEN` differs between the app and the updater.
+- The updater is not mounting `/var/run/docker.sock`.
+- The updater is not mounting `emu-data` at `/data`.
+- `EMU_APP_CONTAINER` does not match the app container's actual name.
 
 ## Manual rollback
 
