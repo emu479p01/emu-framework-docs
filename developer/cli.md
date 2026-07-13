@@ -22,6 +22,12 @@ pnpm emu list
 
 Run commands from the repository root. Review generated files, register business logic where required, and run typecheck after scaffolding.
 
+## Files and version control
+
+Keep each app's manifest and metadata JSON in the structure the CLI scaffolds. Use the CLI to add apps, modules, objects, and Extensions so names and paths stay consistent. Commit artifacts to Git and review the diff before deploying. Use a file-based app for the base solution and a Web Designer layer for customer-specific customization.
+
+If a file-based app is added while the server is already running, reload metadata from the Designer or restart the service — the running process does not pick up new files on its own.
+
 ## Related topics
 
-[Metadata](metadata.md) · [Extensions](extensions.md)
+[Metadata](metadata.md) · [Extensions](extensions.md) · [Customization checklist](customization-checklist.md)

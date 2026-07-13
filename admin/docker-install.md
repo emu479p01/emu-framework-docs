@@ -37,6 +37,17 @@ Docker Engine with Compose and access to `ghcr.io`.
 
 The Compose file supplies the app with `EMU_DEPLOYMENT_MODE=docker`, connects it to the internal updater at `http://updater:3400`, and mounts the named `emu-data` volume at `/data`.
 
+### Overriding the volume and network names
+
+Compose already gives the volume and network explicit names, so backup, monitoring, migration, and external service connections can reference them reliably. To use different names — for example to avoid a collision with another deployment on the same host — set these before the first `docker compose up`:
+
+```dotenv
+EMU_VOLUME_NAME=mycompany-emu-data
+EMU_NETWORK_NAME=mycompany-emu-network
+```
+
+Changing these after the volume and network already exist does not rename them; set them before first creating the stack, or migrate data to the new volume as described below.
+
 ## Image source
 
 Both images are published to the GitHub Container Registry (`ghcr.io`) under the `emu479p01` org, listed at [Your Packages](https://github.com/emu479p01?tab=packages&repo_name=emu-framework):

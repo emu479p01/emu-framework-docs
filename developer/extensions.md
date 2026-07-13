@@ -91,4 +91,4 @@ Validate schema and cross-references, test generated forms/lists/menus, verify a
 
 ## Related topics
 
-[Application workflow](application-workflow.md) · [Metadata](metadata.md) · [Scripts](scripts.md) · [CLI](cli.md) · [Security](security.md)
+[Application workflow](application-workflow.md) · [Metadata](metadata.md) · [Scripts](scripts.md) · [CLI](cli.md) · [Security](security.md) · [Customization checklist](customization-checklist.md)

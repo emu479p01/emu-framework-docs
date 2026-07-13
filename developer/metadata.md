@@ -46,6 +46,60 @@ Schema synchronization is additive: adding tables, fields, and indexes is suppor
 4. Review layer, dependencies, and schema effects.
 5. Run the application and exercise generated list and form pages.
 
+## Metadata API
+
+The API requires an authenticated session with Designer/customize permission for the target app. It is the channel used by integrations, automation, and deployment pipelines.
+
+### Create an object
+
+```http
+POST /api/designer/artifacts
+Content-Type: application/json
+```
+
+The body is a complete artifact and must include `kind` and `name`. This endpoint is create-only and returns `409` when the name already exists.
+
+```json
+{
+  "kind": "enum",
+  "name": "SALES_OrderStatus",
+  "app": "sales",
+  "model": "Customizations",
+  "layer": "CUS",
+  "values": [
+    { "name": "Open", "value": 0 },
+    { "name": "Confirmed", "value": 1 }
+  ]
+}
+```
+
+A successful response returns status `201`.
+
+### Create or update idempotently
+
+```http
+PUT /api/designer/artifacts/{kind}/{name}
+```
+
+Use this when an integration needs to upsert the same object repeatedly. The `kind` and `name` in the URL are authoritative.
+
+### Create multiple objects atomically
+
+Use the change-set workflow:
+
+1. `GET /api/designer/snapshot` to obtain the current `revision`.
+2. `POST /api/designer/change-sets/validate` with the intended operations.
+3. Review the diff, warnings, and any high-risk flags.
+4. `POST /api/designer/change-sets/apply` with the returned `previewId` and human confirmation.
+
+A change set is the right tool when creating an App + Table + Form + Menu + Security together, since it never leaves the system in a half-applied state.
+
+### Supported object kinds
+
+`app`, `table`, `enum`, `form`, `menu`, `script`, `function`, `report`, `privilege`, `duty`, `role`, `tableExtension`, `enumExtension`, `formExtension`, `menuExtension`, `privilegeExtension`, `dutyExtension`, `roleExtension`, `scriptExtension`
+
+Every API channel validates schema, naming, app/model/layer, dependencies, cross-references, and permissions before saving.
+
 ## Related topics
 
-[CLI](cli.md) · [Security](security.md) · [Web Designer](../user/web-designer.md)
+[CLI](cli.md) · [Security](security.md) · [Web Designer](../user/web-designer.md) · [Customization checklist](customization-checklist.md)

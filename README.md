@@ -42,6 +42,7 @@ Documentation for [EmuFramework](https://github.com/emu479p01/emu-framework), ma
 - [Use hooks and data events](developer/hooks-events.md)
 - [Add business logic](developer/business-logic.md)
 - [Understand security](developer/security.md)
+- [Customization checklist](developer/customization-checklist.md)
 
 ### Tools, testing, and operations
 
