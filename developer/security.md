@@ -33,17 +33,20 @@ Buttons for operations the current user cannot perform should remain visible as 
 
 `FW_FrameworkUser` is a self-service account role. It may read only its own `FW_User` record and may update only its password. It must not read or modify another user's record, `FW_UserRole`, or `FW_AppAccess` data, and must not use those records to manage other users.
 
-`FW_SystemAdminRole` is the framework superuser role. It has full access to every app, page, table operation, named function, and report, including newly installed application metadata. The seeded administrator is equivalent for bootstrap/maintenance purposes; replace its default credentials immediately.
+`FW_SystemAdminRole` is the framework superuser role. It has full access to every app, page, table operation, named function, and report, including newly installed application metadata. Administrator authority is role-based: the username `admin` has no special access unless that user holds `FW_SystemAdminRole`.
+
+On first start, setup is the only unauthenticated administrative flow. `GET /api/setup/status` returns `required`, `expiresAt`, `legacyReset`, and the fixed `username` when a legacy reset is required. `POST /api/setup/complete` accepts `code`, `username`, `displayName`, and `password`; it creates or repairs the first administrator, assigns `FW_SystemAdminRole`, and signs in that user. The code expires after 15 minutes or ten failures. Do not expose server logs containing the code to untrusted users.
 
 ## Server-side boundary
 
 Every read and write path must evaluate the authenticated session and authorization policy, including generic data APIs, import/export, named functions, reports, Designer endpoints, and maintenance endpoints. Never rely on hidden routes, filtered menus, disabled buttons, or client-provided role information.
 
-Use secure cookies behind HTTPS, replace seeded credentials, keep updater tokens outside source control, and give Docker socket access only to the dedicated updater.
+Use secure cookies behind HTTPS, protect first-run setup logs, keep updater tokens and integration secret keys outside source control, and give Docker socket access only to the dedicated updater.
 
 ## Migration and compatibility risks
 
 - Existing users whose permissions depended on broad `FW_FrameworkUser` access may lose access to role/app-access screens; grant `FW_SystemAdminRole` or an explicit administrative role where appropriate.
+- An account named `admin` no longer bypasses authorization. Assign `FW_SystemAdminRole` explicitly when unrestricted framework access is required.
 - Privileges created before function/report permissions were introduced need an explicit review and migration. Existing table/form permissions do not automatically imply function/report access.
 - Custom menus may disappear when all of their children become unauthorized. This is expected; verify menu targets after importing metadata.
 - Clients that assume every metadata response contains every table, action, or report must handle filtered collections and disabled operations.

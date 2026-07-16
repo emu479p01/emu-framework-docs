@@ -20,9 +20,10 @@ An application with its tables, permissions, and metadata workflow defined.
 | Pre/post lifecycle behavior | [Hooks and data events](hooks-events.md) |
 | Explicit user operation | [Function/action](functions.md) |
 | Several related registrations | [Script](scripts.md) |
-| Native or external integration | Reviewed TypeScript |
+| Bounded HTTP or email integration | Async [Function/action](functions.md) |
+| Other native or reusable integration | Reviewed TypeScript |
 
-Execute related writes inside a transaction through `DataContext`. Keep validation deterministic, avoid network calls inside database transactions, and enforce authorization on the server even when the client hides an action.
+Execute related writes inside a transaction through `DataContext`. A transactional Function is synchronous and atomic. An async Function may await the built-in HTTP and email services, but it must use short explicit `ctx.tts()` blocks for database writes. Keep validation deterministic, never await network calls inside database transactions, and enforce authorization on the server even when the client hides an action.
 
 ## Testing
 

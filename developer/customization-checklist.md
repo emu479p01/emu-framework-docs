@@ -20,7 +20,9 @@ The customization is complete in a development or staging environment. See [Work
 - Test permissions with a real user account, not only an administrator.
 - Test dynamic lookups when the source is empty, when it changes, and when the referenced record is deleted.
 - Test a Function with `showOnCreate` when no `recordId` is available.
+- For an async Function, test HTTP/email rejection, service timeouts, non-success HTTP status codes, and explicit transaction boundaries.
 - Back up `data.db` and `designer.db`.
+- If SMTP is configured, back up `.emu-secret.key` or `EMU_SECRET_KEY_PATH` separately.
 - Confirm the Docker volume/network names for each deployment's environment.
 - Export the app/model package or keep the metadata files in source control.
 

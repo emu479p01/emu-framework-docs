@@ -20,6 +20,7 @@ Access to application logs, the previous framework version, and the latest verif
 4. Docker: verify whether the sidecar restored the previous container, then follow the manual rollback procedure.
 5. Start the previous framework version and verify data before retrying.
 6. Restore the `.emubackup` only if data verification fails or release notes explicitly require database rollback.
+7. Restore `.emu-secret.key` or the configured `EMU_SECRET_KEY_PATH` separately. After returning to a version that supports SMTP, verify the connection and send a test message.
 
 Do not mix framework files from multiple releases. Preserve the failed state until logs and backups have been collected.
 

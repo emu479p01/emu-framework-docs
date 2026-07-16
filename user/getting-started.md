@@ -19,6 +19,8 @@ An application URL and an account provisioned by an administrator.
 3. Choose an app and menu item from the sidebar.
 4. Use the sidebar button to collapse navigation on a small screen.
 
+On small screens, action pickers, line grids, imports, and administrative table views use stacked record cards or scrollable content instead of wide desktop tables. Buttons are enlarged for touch use. In Report Designer, swipe horizontally inside the canvas area to reach the full report width.
+
 ## Expected result
 
 Only apps and pages permitted by your assigned roles are visible.

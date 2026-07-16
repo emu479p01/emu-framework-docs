@@ -93,6 +93,20 @@ When the source field changes, any dropdown that depends on it reloads its optio
 
 A Function that runs before create does not receive `recordId`, but it still receives the current `record` values — write it to handle the missing-ID case. See [Develop Functions and actions](../developer/functions.md).
 
+## Function execution mode
+
+Choose **Transactional — synchronous and atomic** for normal database operations. This is the default and wraps the Function in one transaction.
+
+Choose **Async integration — supports await, HTTP and email** when the Function calls `services.http.request(...)` or `services.email.send(...)`. Async mode does not keep one database transaction open while waiting for the network. Put database changes in short explicit `ctx.tts()` blocks, and never await an external request inside a transaction.
+
+The Function body receives `ctx`, `args`, `kernel`, and `services`. Async Functions must handle rejected requests and non-success HTTP status codes explicitly.
+
+## Report Designer on small screens
+
+The report canvas keeps its document width so element positions remain stable. On a phone or narrow browser, scroll horizontally inside the canvas. Settings, parameters, line sources, and the selected-element panel stack vertically.
+
+`Noto Sans Thai` is bundled and available without a Google Fonts API key. PDF output automatically selects it for Thai text.
+
 ## Menus and the sidebar
 
 - Level 1 menu items are the primary sidebar entries.

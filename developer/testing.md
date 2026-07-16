@@ -24,9 +24,11 @@ Unit tests cover metadata, security, data APIs, CLI, and UI utilities. Server in
 
 For every hook, event, Script, or Function, test valid input, invalid input, rollback after a failed related write, authorized and unauthorized users, update validation, and delete/reference behavior. Post-events must not be expected to cancel completed operations.
 
+For async Functions, test HTTP/email success and rejection, the 15-second default timeout and configured timeout behavior, non-success HTTP status handling, response/content limits, missing SMTP configuration, rejected recipients, and explicit transaction boundaries. Prove that a service failure does not leave a partial database update unless that partial commit is intentional.
+
 ## Debugging links
 
-When metadata does not appear, check the artifact kind/name, JSON shape, app/model scope, references, layer, diagnostics, and generated form/list. When a Function fails, check the action name, request arguments, permissions, record lookup, field types, rollback, and duplicate registrations.
+When metadata does not appear, check the artifact kind/name, JSON shape, app/model scope, references, layer, diagnostics, and generated form/list. When a Function fails, check the action name, request arguments, `executionMode`, permissions, integration configuration, record lookup, field types, transaction boundaries, and duplicate registrations.
 
 Release candidates also require a Windows updater exercise and a Docker smoke update that proves the named volume survives container replacement.
 

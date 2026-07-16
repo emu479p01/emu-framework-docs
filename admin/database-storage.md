@@ -14,6 +14,8 @@ Host access to Docker or the Windows installation and a verified backup before s
 
 SQLite files grow automatically as records and indexes are added. There is no database-size setting to increase. Available space is controlled by the Windows disk or by the disk/VM that stores Docker volumes.
 
+The integration encryption key is not a SQLite file. It is stored at `EMU_SECRET_KEY_PATH`, or as `.emu-secret.key` beside `designer.db`. Keep it on persistent storage and back it up separately from `.emubackup` exports.
+
 ## Check Docker usage
 
 1. Run `docker system df` for host-wide usage.

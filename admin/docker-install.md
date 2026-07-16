@@ -18,7 +18,7 @@ Docker Engine with Compose and access to `ghcr.io`.
 2. Create `.env` beside `docker-compose.yml`:
 
    ```env
-   EMU_VERSION=0.0.1.1
+   EMU_VERSION=0.1.0.2
    EMU_UPDATER_TOKEN=replace-with-a-random-secret-at-least-24-characters
    PORT=3399
    EMU_SECURE_COOKIES=true
@@ -33,9 +33,24 @@ Docker Engine with Compose and access to `ghcr.io`.
    docker compose ps
    ```
 
-4. Open `http://localhost:3399`.
+4. Read the one-time administrator setup code:
+
+   ```sh
+   docker compose logs app
+   ```
+
+5. Open `http://localhost:3399`, enter the code, choose the administrator username, and set a password of at least 12 characters.
+
+The code expires after 15 minutes or ten failed attempts. Restart the app container to generate a new code:
+
+```sh
+docker compose restart app
+docker compose logs --tail=100 app
+```
 
 The Compose file supplies the app with `EMU_DEPLOYMENT_MODE=docker`, connects it to the internal updater at `http://updater:3400`, and mounts the named `emu-data` volume at `/data`.
+
+The default integration secret key is `/data/.emu-secret.key`, so it persists in the same named volume. It is not included in `.emubackup` exports; keep a separate secure copy after configuring SMTP. Set `EMU_SECRET_KEY_PATH` only when the replacement path is also mounted persistently.
 
 ### Overriding the volume and network names
 
@@ -97,7 +112,10 @@ EMU_UPDATER_URL=http://updater:3400
 EMU_UPDATER_TOKEN=<same token as updater>
 EMU_DB_PATH=/data/data.db
 EMU_DESIGNER_DB_PATH=/data/designer.db
+EMU_SECRET_KEY_PATH=/data/.emu-secret.key
 ```
+
+After starting a manually created app container, run `docker logs --tail 100 emu-framework`, copy the one-time setup code, and complete **Administrator setup** at `http://localhost:3399`. Restart the container if the code expires.
 
 The updater container must use the matching updater image, the same token, the same `emu-network` network, the `emu-data` volume, and a Docker socket mount:
 

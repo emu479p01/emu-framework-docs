@@ -36,6 +36,8 @@ For Docker, the app contacts the internal updater service using `EMU_UPDATER_URL
 
 The persistent `emu-data` volume is reused by the replacement container. Container rollback does not roll back database contents; keep the pre-update `.emubackup` until the new version has been verified.
 
+When upgrading to v0.1.0.2, complete **Administrator setup** if the server detects the legacy `admin` / `admin` credentials or no enabled user with `FW_SystemAdminRole`. The automatic `.emubackup` does not include `.emu-secret.key`: preserve that key separately, verify administrator role assignments, and test SMTP after the update.
+
 ## Manual fallback
 
 - Windows: run `Update.cmd`.

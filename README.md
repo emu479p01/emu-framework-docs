@@ -4,6 +4,10 @@
 
 Documentation for [EmuFramework](https://github.com/emu479p01/emu-framework), maintained in the dedicated [emu-framework-docs repository](https://github.com/emu479p01/emu-framework-docs). Choose a learning path by role, then use the focused concept, how-to, and reference pages.
 
+Current framework version: **0.1.0.2 (Beta)**
+
+- [Release notes for v0.1.0.1 and v0.1.0.2](release-notes.md)
+
 ## User
 
 - [Sign in and navigate](user/getting-started.md)
