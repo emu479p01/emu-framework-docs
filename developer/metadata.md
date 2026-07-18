@@ -26,7 +26,7 @@ flowchart LR
 
 ## Concepts
 
-Metadata describes apps, modules, tables, fields, enums, forms, menus, privileges, duties, roles, reports, Scripts, and Functions. `name` is a stable identifier; `label` is user-facing text. Supported base kinds include `app`, `enum`, `table`, `form`, `menu`, `privilege`, `duty`, `role`, `script`, `function`, and `report`.
+Metadata describes Apps, Models, tables, fields, enums, Forms, menus, Privileges, Duties, Roles, Reports, Views, Charts, Scripts, and Functions. `name` is a stable identifier; `label` is user-facing text. Supported base kinds include `app`, `enum`, `table`, `form`, `menu`, `privilege`, `duty`, `role`, `script`, `function`, `report`, `view`, and `chart`.
 
 Metadata is resolved through ordered layers: `SYS < ISV < LOC < DEV < CUS`. Base artifacts at a higher layer override lower-layer artifacts with the same logical identity; Extensions accumulate into their target. See [Work with metadata layers](layers.md) for ownership and precedence rules.
 
@@ -40,8 +40,8 @@ Schema synchronization is additive: adding tables, fields, and indexes is suppor
 
 ## Procedure
 
-1. Choose a stable name and owning app.
-2. Define referenced enums and tables before forms, reports, menus, and actions.
+1. Choose a stable name, owning App, existing Model, and matching Layer.
+2. Define referenced enums and tables before Forms, Views, Charts, Reports, menus, and actions.
 3. Validate the artifact shape and cross-references.
 4. Review layer, dependencies, and schema effects.
 5. Run the application and exercise generated list and form pages.
@@ -57,7 +57,7 @@ POST /api/designer/artifacts
 Content-Type: application/json
 ```
 
-The body is a complete artifact and must include `kind` and `name`. This endpoint is create-only and returns `409` when the name already exists.
+The body is a complete artifact and must include `kind`, `name`, `app`, `model`, and the selected Model's `layer` for business objects. This endpoint is create-only and returns `409` when the name already exists.
 
 ```json
 {
@@ -92,14 +92,16 @@ Use the change-set workflow:
 3. Review the diff, warnings, and any high-risk flags.
 4. `POST /api/designer/change-sets/apply` with the returned `previewId` and human confirmation.
 
-A change set is the right tool when creating an App + Table + Form + Menu + Security together, since it never leaves the system in a half-applied state.
+A change set is the right tool when creating a Table + Form + Menu + Security graph inside an existing App/Model, since it never leaves the system in a half-applied state. Create the App, then add its Model, before validating that graph.
 
 ### Supported object kinds
 
-`app`, `table`, `enum`, `form`, `menu`, `script`, `function`, `report`, `privilege`, `duty`, `role`, `tableExtension`, `enumExtension`, `formExtension`, `menuExtension`, `privilegeExtension`, `dutyExtension`, `roleExtension`, `scriptExtension`
+`app`, `table`, `enum`, `form`, `menu`, `script`, `function`, `report`, `view`, `chart`, `privilege`, `duty`, `role`, `tableExtension`, `enumExtension`, `formExtension`, `menuExtension`, `privilegeExtension`, `dutyExtension`, `roleExtension`, `scriptExtension`
+
+An App is created with `models: []`. Add a Model through Designer or CLI before creating other artifacts. System metadata appears only to a System Administrator in the **Framework — Read-only** scope and is rejected by every mutation and packaging endpoint.
 
 Every API channel validates schema, naming, app/model/layer, dependencies, cross-references, and permissions before saving.
 
 ## Related topics
 
-[CLI](cli.md) · [Security](security.md) · [Web Designer](../user/web-designer.md) · [Customization checklist](customization-checklist.md)
+[CLI](cli.md) · [Security](security.md) · [Views and Charts](views-and-charts.md) · [Web Designer](../user/web-designer.md) · [Customization checklist](customization-checklist.md)

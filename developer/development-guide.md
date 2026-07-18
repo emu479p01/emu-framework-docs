@@ -32,6 +32,7 @@ flowchart LR
 - [Understand Apps, Models, and Layers](app-model-layer.md)
 - [Work with metadata layers](layers.md)
 - [Build an application](application-workflow.md)
+- [Build Views and embedded Charts](views-and-charts.md)
 - [Create extensions](extensions.md)
 - [Use hooks and data events](hooks-events.md)
 

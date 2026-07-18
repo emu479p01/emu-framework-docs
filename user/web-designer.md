@@ -14,17 +14,21 @@ Your account needs Designer permission for the target app.
 
 ## Procedure
 
-1. Open **Web Designer** and select an existing app or create one.
-2. Use **Simple Builder** to create a table, form, and menu entry together.
-3. Add fields and validate their names and types.
-4. Save, review the generated change set, and apply it.
-5. Open the app and verify the form and list.
+1. Open **Web Designer** and select an existing App or create one. A new App starts with zero Models.
+2. Add a Model and choose its Layer, or use the explicit Model step in **Simple Builder**. No Model or Layer is selected automatically.
+3. Select the App and Model before creating an artifact.
+4. Use **Simple Builder** to create a table, Form, and menu entry together.
+5. Add fields and validate their names and types.
+6. Save, review the generated change set, and apply it.
+7. Open the App and verify the Form and list with a separately authorized runtime account.
 
 ## Recommended customization order
 
 Work through objects in this order so each step can reference the ones before it: **App → Model → Object → Menu → Privilege/Duty/Role**.
 
-The Designer supports these object kinds, including Extensions of the kinds that support extension: App, Table, Enum, Form, Menu, Function, Script, Report, Privilege, Duty, Role.
+The Designer supports these object kinds, including Extensions of the kinds that support extension: App, Table, Enum, Form, Menu, Function, Script, Report, View, Chart, Privilege, Duty, and Role.
+
+`canCustomize` grants Designer capability for the selected App only. It does not grant `canOpen` or business-data permissions. System Administrators can inspect Framework metadata under **Framework — Read-only**, but nobody can change, delete, package, or extend it.
 
 ## Tables and fields
 
@@ -70,6 +74,7 @@ When the source field changes, any dropdown that depends on it reloads its optio
 - `listFields` sets the columns shown on the list page.
 - `filterFields` sets the columns a user can search by; when omitted, the form falls back to `listFields`.
 - `groups` arranges fields on the detail page.
+- `charts` embeds reusable Chart artifacts after groups and before line grids.
 - `lines` builds a master-detail grid with aggregates and line-level actions.
 - A header action that should appear before the record is saved for the first time needs `showOnCreate: true`.
 
@@ -113,6 +118,12 @@ The report canvas keeps its document width so element positions remain stable. O
 - Level 2 and deeper menu items open as a navigation overlay to the right of the sidebar; the overlay does not shrink the content area and closes when the user selects a menu item, clicks outside it, presses Escape, or uses its close button.
 - A menu target can be a Form, Function, Report, route, or a group/submenu.
 
+## Views and Charts
+
+Use the View builder to define a declarative query from validated tables, joins, fields, parameters, filters, grouping, and aggregates. Use the Chart editor to map View output to a bar, line, pie, donut, or KPI visualization. Then use the Form Chart editor to choose width and bind View parameters from current-record fields or literals.
+
+Designer validates references, types, grouping, App dependencies, and protected tables before apply. See [Build Views and embedded Charts](../developer/views-and-charts.md).
+
 ## Extensions in the Designer
 
 Use an Extension when you need to add a field, form layout/action, menu item, enum value, or security metadata without changing the base object. The source layer must be strictly higher than the target layer, and extending across apps requires that app dependency to be declared. Use the Designer-generated Extension name to avoid duplicate names and to keep the target traceable. See [Create extensions](../developer/extensions.md) and [Work with metadata layers](../developer/layers.md).
@@ -128,4 +139,4 @@ Metadata is stored in `designer.db`; additive schema changes are applied to the 
 
 ## Related topics
 
-[Metadata](../developer/metadata.md) · [Extensions](../developer/extensions.md) · [Functions and actions](../developer/functions.md) · [Customization checklist](../developer/customization-checklist.md) · [Backup](../admin/backup.md)
+[Metadata](../developer/metadata.md) · [Views and Charts](../developer/views-and-charts.md) · [Security](../developer/security.md) · [Extensions](../developer/extensions.md) · [Functions and actions](../developer/functions.md) · [Customization checklist](../developer/customization-checklist.md) · [Backup](../admin/backup.md)

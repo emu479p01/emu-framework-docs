@@ -38,6 +38,16 @@ The persistent `emu-data` volume is reused by the replacement container. Contain
 
 When upgrading to v0.1.0.2, complete **Administrator setup** if the server detects the legacy `admin` / `admin` credentials or no enabled user with `FW_SystemAdminRole`. The automatic `.emubackup` does not include `.emu-secret.key`: preserve that key separately, verify administrator role assignments, and test SMTP after the update.
 
+When upgrading to v0.1.1.0, review the deny-by-default migration before opening production:
+
+1. Back up `data.db`, `designer.db`, and `.emu-secret.key` separately.
+2. Confirm at least one enabled account holds `FW_SystemAdminRole`.
+3. Review each user's Role and App Access. Existing `FW_FrameworkUser` accounts gain Customize only for business Apps present during the upgrade; Open is not added.
+4. Verify legacy artifacts received a valid Model and that no new App receives a name-based default Model.
+5. Test password change/reset, direct API denial, View/Chart privileges, and any Power BI token scopes.
+
+Migrations run once in a transaction and are recorded in the migration ledger. Restarting the upgraded version must not grant additional App Access or repeat legacy Model materialization.
+
 ## Manual fallback
 
 - Windows: run `Update.cmd`.

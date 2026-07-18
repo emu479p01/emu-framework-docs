@@ -4,9 +4,9 @@
 
 Documentation for [EmuFramework](https://github.com/emu479p01/emu-framework), maintained in the dedicated [emu-framework-docs repository](https://github.com/emu479p01/emu-framework-docs). Choose a learning path by role, then use the focused concept, how-to, and reference pages.
 
-Current framework version: **0.1.0.2 (Beta)**
+Current framework version: **0.1.1.0 (Beta)**
 
-- [Release notes for v0.1.0.1 and v0.1.0.2](release-notes.md)
+- [Release notes](release-notes.md)
 
 ## User
 
@@ -18,6 +18,8 @@ Current framework version: **0.1.0.2 (Beta)**
 - [Install on Windows](admin/windows-install.md)
 - [Install with Docker](admin/docker-install.md)
 - [Configure the application](admin/configuration.md)
+- [Manage users and application access](admin/user-security.md)
+- [Connect Power BI to the View API](admin/power-bi-view-api.md)
 - [Update the framework](admin/framework-update.md)
 - [Back up databases](admin/backup.md)
 - [Restore databases](admin/restore.md)
@@ -46,6 +48,7 @@ Current framework version: **0.1.0.2 (Beta)**
 - [Use hooks and data events](developer/hooks-events.md)
 - [Add business logic](developer/business-logic.md)
 - [Understand security](developer/security.md)
+- [Build Views and embedded Charts](developer/views-and-charts.md)
 - [Customization checklist](developer/customization-checklist.md)
 
 ### Tools, testing, and operations

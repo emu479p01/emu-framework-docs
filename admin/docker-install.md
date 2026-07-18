@@ -18,7 +18,7 @@ Docker Engine with Compose and access to `ghcr.io`.
 2. Create `.env` beside `docker-compose.yml`:
 
    ```env
-   EMU_VERSION=0.1.0.2
+   EMU_VERSION=0.1.1.0
    EMU_UPDATER_TOKEN=replace-with-a-random-secret-at-least-24-characters
    PORT=3399
    EMU_SECURE_COOKIES=true

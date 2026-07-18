@@ -18,7 +18,10 @@ flowchart TD
     M --> L[Model layer]
     L --> B[Enums]
     B --> C[Tables and fields]
+    C --> V[Views]
+    V --> Z[Charts]
     C --> D[Forms and reports]
+    Z --> D
     D --> E[Menus]
     E --> F[Privileges]
     F --> G[Duties]
@@ -28,19 +31,20 @@ flowchart TD
     J --> F
 ```
 
-Create the App and Models before the artifacts that use them, then create referenced enums and tables before forms, reports, menus, security, Scripts, or Functions. The registry validates app/model scope and cross-references during application loading.
+Create the App first; it starts with zero Models. Add and select a Model before any artifact. Then create referenced enums and tables before Views, Charts, Forms, Reports, menus, security, Scripts, or Functions. The registry validates App/Model scope and cross-references during application loading.
 
 ## Procedure
 
-1. Create the App with the CLI or Web Designer.
-2. Define its Models, dependencies, and layer ownership.
+1. Create the App with the CLI or Web Designer and verify that it has no implicit Model.
+2. Add its Models, dependencies, and Layer ownership explicitly.
 3. Define enums, tables, fields, references, and indexes.
-4. Define forms, list fields, menus, and reports.
-5. Add privileges, duties, roles, and app access.
-6. Choose the smallest business-logic mechanism for each rule.
-7. Validate metadata, app/model scope, and cross-references.
-8. Test generated lists, forms, actions, permissions, and database effects.
-9. Export a package or commit the source-controlled metadata.
+4. Define Views and Charts when the App needs reusable queries or visualizations.
+5. Define Forms, list fields, embedded Charts, menus, and Reports.
+6. Add Privileges (including Views), Duties, Roles, and App Access.
+7. Choose the smallest business-logic mechanism for each rule.
+8. Validate metadata, App/Model scope, and cross-references.
+9. Test generated lists, Forms, Charts, actions, permissions, and database effects.
+10. Export a package or commit the source-controlled metadata.
 
 ## Source-controlled versus Web Designer metadata
 
@@ -48,4 +52,4 @@ Use file-based metadata for application definitions that require code review, re
 
 ## Related topics
 
-[Metadata](metadata.md) · [Extensions](extensions.md) · [Functions and actions](functions.md) · [Testing](testing.md)
+[Metadata](metadata.md) · [Views and Charts](views-and-charts.md) · [Security](security.md) · [Extensions](extensions.md) · [Functions and actions](functions.md) · [Testing](testing.md)

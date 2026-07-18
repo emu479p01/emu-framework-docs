@@ -1,6 +1,44 @@
-# Release notes: v0.1.0.1 and v0.1.0.2
+# Release notes
 
 These notes describe the changes since v0.1.0.0 that affect users, administrators, and application developers.
+
+## v0.1.1.0
+
+### Deny-by-default security
+
+- Runtime access now requires both App Access (`canOpen`) and Role → Duty → Privilege permission. `FW_SystemAdminRole` is the only global bypass.
+- `canCustomize` is independent. It opens only the granted business App in Designer and grants no App entry or business-data access. `FW_FrameworkUser` remains only as a legacy marker.
+- User, Role assignment, App Access, session, migration, Designer-artifact, and View-token tables are blocked from generic data, import, and export endpoints.
+- System Administrators manage users through **Settings → Users & Security**. Usernames are immutable, assignments are selected from validated Roles and Apps, and the last enabled System Administrator is protected.
+- Every user can change their own password with current-password verification. Administrators can reset a password. Both flows require at least 12 characters and revoke old sessions; password and token hashes are omitted from responses.
+
+See [Manage users and application access](admin/user-security.md) and the complete [permission matrix](developer/security.md).
+
+### Explicit Apps and Models
+
+- Every new App starts with `models: []`, including Apps named `erp`, `erp.credit`, or `web`. No App name creates a hidden or default Model.
+- Add a named Model and choose its Layer before creating artifacts. App is the runtime access and navigation boundary; Model groups development metadata and is not a security boundary.
+- Designer and CLI object creation require an explicit App and Model. The CLI adds `pnpm emu add model <app> <name> --layer <layer>`.
+- Framework metadata is shown to System Administrators in a separate **Framework — Read-only** area and cannot be edited, deleted, imported, exported, or extended.
+
+Upgrade migrations materialize Models referenced by legacy artifacts and preserve old ERP/web metadata only for upgraded data. The one-time migration ledger prevents a later boot from granting access or recreating legacy Models again.
+
+### Declarative Views and embedded Charts
+
+- View artifacts support validated source aliases, inner/left equality joins, typed parameters, bound filters, grouping, sorting, and `count`, `sum`, `avg`, `min`, and `max` aggregates without raw SQL.
+- Interactive View calls enforce App Access, View privilege, source-table read privileges, and row scopes.
+- JSON is paged at 1,000 rows by default and capped at 10,000 per request. CSV exports default to a configurable cap of 100,000 rows.
+- High-entropy service tokens are stored as hashes, scoped to named Views, optionally expiring, revocable, and accepted only in the Bearer header for View endpoints.
+- Reusable bar, line, pie, donut, and KPI Chart artifacts can be embedded in Forms with record/literal parameter bindings. Apache ECharts is bundled locally and renders responsively.
+
+See [Build Views and embedded Charts](developer/views-and-charts.md) and [Connect Power BI to the View API](admin/power-bi-view-api.md).
+
+### Compatibility notes
+
+- Existing `FW_FrameworkUser` assignments receive `canCustomize=true` only for business Apps that existed during upgrade; existing `canOpen` is preserved and new Apps require a new grant.
+- Users without App Access are denied after upgrade unless they hold `FW_SystemAdminRole`.
+- Generic `/api/data/FW_*` access to protected security tables now returns an authorization/not-found response by design.
+- Back up and test the security matrix, legacy Model migration, password flows, Views, service tokens, and Charts before upgrading production.
 
 ## v0.1.0.2
 
@@ -48,4 +86,4 @@ The application shell, action picker, master-detail line grids, import workflow,
 
 ## Related topics
 
-[Install on Windows](admin/windows-install.md) · [Install with Docker](admin/docker-install.md) · [Configuration](admin/configuration.md) · [Functions and actions](developer/functions.md) · [Security](developer/security.md)
+[Install on Windows](admin/windows-install.md) · [Install with Docker](admin/docker-install.md) · [Configuration](admin/configuration.md) · [Functions and actions](developer/functions.md) · [Security](developer/security.md) · [Views and Charts](developer/views-and-charts.md)

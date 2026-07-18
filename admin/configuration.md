@@ -22,12 +22,15 @@ Access to the Windows launcher or Docker environment and permission to restart t
 | `EMU_DESIGNER_DB_PATH` | Designer SQLite file | deployment default |
 | `EMU_SECRET_KEY_PATH` | 32-byte integration encryption key file | `.emu-secret.key` beside `designer.db` |
 | `EMU_SECURE_COOKIES` | Require HTTPS cookies | production dependent |
+| `EMU_VIEW_CSV_MAX_ROWS` | Maximum rows in one View CSV export | `100000` |
 | `EMU_UPDATER_TOKEN` | App-to-sidecar secret | required for Docker update |
 | `EMU_APP_CONTAINER` | Updater-only: name of the app container to restart | required for Docker update |
 | `EMU_IMAGE_REPOSITORY` | Updater-only: app image repository to pull | `ghcr.io/emu479p01/emu-framework` |
 | `EMU_UPDATE_STATE_PATH` | Updater-only: path to the update status file | `/data/update-status.json` |
 
 Restart the app after changing environment values. Use HTTPS and `EMU_SECURE_COOKIES=true` on an internet-facing deployment.
+
+View JSON endpoints always cap one page at 10,000 rows. `EMU_VIEW_CSV_MAX_ROWS` controls the separate CSV export cap used by Power BI and other integrations; choose a limit that fits available memory and request time.
 
 ## Manage report fonts
 
@@ -65,4 +68,4 @@ POST /api/system/integrations/smtp/test
 
 ## Related topics
 
-[Docker installation](docker-install.md) · [Troubleshooting](troubleshooting.md)
+[Power BI View API](power-bi-view-api.md) · [Docker installation](docker-install.md) · [Troubleshooting](troubleshooting.md)

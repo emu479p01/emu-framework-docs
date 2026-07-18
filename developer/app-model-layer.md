@@ -36,7 +36,7 @@ App
         └── Metadata artifacts
 ```
 
-An artifact can identify its owning `app`, optional `model`, and optional `layer`. The App establishes scope and dependencies; the Model organizes the app's definitions; the Layer resolves ownership and precedence.
+Every new business artifact identifies its owning `app` and `model`; its `layer` must agree with the selected Model. The App establishes runtime access, navigation scope, and dependencies. The Model organizes development definitions. The Layer resolves ownership and precedence.
 
 ## App
 
@@ -49,17 +49,19 @@ The App manifest defines the application identity, display information, dependen
   "label": "Sales",
   "icon": "grid",
   "dependsOn": [],
-  "models": [
-    { "name": "SalesCore", "label": "Sales Core", "layer": "DEV" }
-  ]
+  "models": []
 }
 ```
 
-Use the App boundary to decide what belongs together, what the application depends on, and which users can access it. `dependsOn` also determines load order: the kernel registers apps by walking the dependency graph so a dependency is always registered before any app that depends on it, and this now also governs whether a cross-app Extension is allowed (see [Extensions](extensions.md)).
+Every App created in v0.1.1.0 starts with zero Models. This includes names such as `erp`, `erp.credit`, and `web`; no App name creates `MiniERPApplication` or another hidden default. Add a Model explicitly before creating an artifact.
+
+Use the App boundary to decide what belongs together, what the application depends on, which users may open or customize it, and how its navigation is filtered. `dependsOn` determines load order and whether a cross-App reference, View, Chart, or Extension is allowed (see [Extensions](extensions.md)).
 
 ## Model
 
 A Model is a named grouping within an App. Use Models to separate coherent areas of an application, such as core sales definitions, reporting definitions, or a customer-specific customization set. A Model can carry its own layer assignment in the App manifest, while individual artifacts may also specify ownership and layer according to the metadata contract.
+
+A Model is not a security boundary. Creating or selecting one never grants App entry, Designer access, or business-object permission.
 
 Keep references within the correct App and Model scope. Create the Model and its foundational definitions before forms, menus, security artifacts, Scripts, or Functions that depend on them.
 
@@ -96,8 +98,8 @@ flowchart LR
 
 ## Recommended design
 
-1. Define the App and its dependencies.
-2. Define Models that represent coherent application areas.
+1. Define the App and its dependencies; expect `models: []` initially.
+2. Add Models that represent coherent application areas and choose each Layer explicitly.
 3. Assign the appropriate Model layer and ownership.
 4. Add enums, tables, and references.
 5. Add forms, menus, reports, and security.
@@ -107,11 +109,13 @@ flowchart LR
 
 ## Common mistakes
 
-- Treating an App as if it has no Model boundary.
+- Expecting the App name to create a default Model.
+- Attempting to create an artifact before adding and selecting a Model.
 - Putting a customization in a product layer instead of `LOC`, `DEV`, or `CUS`.
 - Referencing an artifact from another App or Model without declaring the dependency.
 - Replacing a base artifact when an Extension should have been used.
 - Assuming a Model or Layer automatically grants security access; permissions still require explicit security metadata.
+- Treating Framework/System Models as an extension target; they are read-only inspection metadata.
 
 ## Related topics
 
