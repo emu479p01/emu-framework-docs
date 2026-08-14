@@ -21,7 +21,7 @@ pnpm emu list
 
 `add app` creates an App manifest with `models: []`; it never infers a Model from the App name. Run `add model` before `add object`. `add object` rejects an App with no Models and requires `--model` in non-interactive use; interactive use asks the user to select an existing Model.
 
-`add extension` prompts interactively for the source Model (when the App has more than one) and derives the canonical name `<AppPrefix>_<ModelName>_<BaseName>_Extension`. It only offers targets that the extending Model's Layer is allowed to extend — that is, targets at a strictly lower Layer — and resolves the App's `dependsOn` chain when the target belongs to another App.
+`add extension` prompts for `tableExtension`, `formExtension`, `menuExtension`, `viewExtension`, `chartExtension`, or `functionExtension`, then for the source Model when needed. It derives the canonical name `<AppPrefix>_<ModelName>_<BaseName>_Extension`, only offers targets at a strictly lower Layer, and resolves the App's `dependsOn` chain when the target belongs to another App. Other supported Extension kinds can be authored through Designer or validated JSON.
 
 Run commands from the repository root. Review generated files, register business logic where required, and run typecheck after scaffolding.
 

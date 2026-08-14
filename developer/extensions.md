@@ -27,10 +27,28 @@ Base artifacts with the same logical identity follow `SYS < ISV < LOC < DEV < CU
 
 ```text
 tableExtension, enumExtension, formExtension, menuExtension,
-privilegeExtension, dutyExtension, roleExtension, scriptExtension
+privilegeExtension, dutyExtension, roleExtension, scriptExtension,
+viewExtension, chartExtension, functionExtension
 ```
 
-The target property matches the kind: `table`, `enum`, `form`, `menu`, `privilege`, `duty`, `role`, or `script`.
+The target property matches the kind: `table`, `enum`, `form`, `menu`, `privilege`, `duty`, `role`, `script`, `view`, `chart`, or `function`.
+
+## Delta and presentation overrides
+
+An Extension stores only the current Layer delta. Inherited metadata remains read-only. Use additive arrays for new fields, indexes, groups, actions, lines, joins, columns, measures, permissions, or behavior; use an override array for presentation changes:
+
+| Extension | Override collection | Supported changes |
+| --- | --- | --- |
+| `tableExtension` | `fieldOverrides` | field label and create/update editability |
+| `enumExtension` | `valueOverrides` | enum-value label |
+| `formExtension` | `elementOverrides` | group/action/Chart/line label, visibility, and order by stable `targetId` |
+| `menuExtension` | `itemOverrides` | menu label, icon, visibility, and order by stable `targetId` |
+| `viewExtension` | `columnOverrides` | output-column label |
+| `chartExtension` | `measureOverrides` | measure label and color |
+
+Form groups, actions, Charts, lines, and menu items should have stable `id` values. Target those IDs rather than array positions so a lower-layer insertion or reordering does not redirect a customization.
+
+`functionExtension` supplies Chain-of-Command code. Call `next(args)` to continue the inherited implementation; review it as executable code and test both the extended and base paths.
 
 ## Prerequisites
 
@@ -73,9 +91,11 @@ Use file-based Extensions for reviewed, repeatable, source-controlled applicatio
 
 ## Naming, ordering, and removal
 
-Names are stable identifiers and must be unique. The canonical form is `<AppPrefix>_<ModelName>_<BaseName>_Extension`; the CLI and Web Designer derive this automatically from the extending app, the source Model, and the target artifact. Extensions saved under the older `<AppPrefix>_<BaseName>_Extension` form (without the Model segment) remain supported — they are not renamed automatically — but the registry logs a legacy-name warning, and the change-set preview surfaces the same warning so it can be addressed deliberately.
+Names are stable identifiers and must be unique. The canonical form is `<AppPrefix>_<ModelName>_<BaseName>_Extension`; the CLI and Web Designer derive this automatically from the extending app, the source Model, and the target artifact. The v0.1.4.0 migration renames an older `<AppPrefix>_<BaseName>_Extension` form when the canonical target is unambiguous and available. A legacy name that cannot be migrated remains supported with a registry/change-set warning so it can be addressed deliberately.
 
 Only one Extension of a given kind may target the same base artifact from the same app and Model; the registry rejects a second `tableExtension`, `formExtension`, and so on for an identical `(app, model, kind, target)` combination.
+
+During the v0.1.4.0 upgrade, the framework adds stable IDs where needed, normalizes legacy field rules, and renames a legacy Extension to its canonical name only when safe. It keeps audit copies and records the migration once; review diagnostics instead of manually rerunning it.
 
 An Extension's `layer` must be strictly higher than the target artifact's layer — extending at the same layer as the target is rejected. When the target belongs to a different app, that dependency must be declared (directly or transitively) in the extending app's `dependsOn`; the registry now validates this at load time instead of relying on convention.
 

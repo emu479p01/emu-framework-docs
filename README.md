@@ -4,7 +4,7 @@
 
 Documentation for [EmuFramework](https://github.com/emu479p01/emu-framework), maintained in the dedicated [emu-framework-docs repository](https://github.com/emu479p01/emu-framework-docs). Choose a learning path by role, then use the focused concept, how-to, and reference pages.
 
-Current framework version: **0.1.1.0 (Beta)**
+Current framework version: **0.1.4.0 (Beta)**
 
 - [Release notes](release-notes.md)
 
@@ -19,6 +19,7 @@ Current framework version: **0.1.1.0 (Beta)**
 - [Install with Docker](admin/docker-install.md)
 - [Configure the application](admin/configuration.md)
 - [Manage users and application access](admin/user-security.md)
+- [Manage application data](admin/app-data-management.md)
 - [Connect Power BI to the View API](admin/power-bi-view-api.md)
 - [Update the framework](admin/framework-update.md)
 - [Back up databases](admin/backup.md)

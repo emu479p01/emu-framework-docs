@@ -24,6 +24,10 @@ For v0.1.1.0, cover the complete authorization matrix: no Role/no App Access, Ro
 
 For Views, test joins, typed parameters, literal and parameter filters, grouping/aggregates, invalid metadata, protected sources, injection attempts, row limits, App dependencies, and row scopes. Test session and service-token requests for valid, wrong-scope, expired, and revoked cases. For Charts, cover every type, parameter binding, missing required parameters, unauthorized Views, and responsive cleanup/resize.
 
+For v0.1.2.0–v0.1.4.0, also test 20 MB metadata-package imports, mobile form focus without automatic zoom, desktop accordion state, every App-data package validation failure, atomic replace/delete, partial backup components, restore restart/rollback, and restored login credentials. Verify the layered-customization migration is idempotent, preserves audit records, and never changes business data.
+
+For Extension deltas, test every supported inherited-layer transition, stable Form/Menu IDs, hidden/order/label overrides, field editability, View columns, Chart measures, and Function `next(args)` behavior. Reject duplicate targets, same/lower-layer Extensions, missing dependencies, mandatory Enum/read-only fields, and structural properties that the Extension schema does not allow. Exercise line confirmation dialogs, the two-axis business grid, and mixed Thai/Latin PDF output.
+
 ## Business-logic test cases
 
 For every hook, event, Script, or Function, test valid input, invalid input, rollback after a failed related write, authorized and unauthorized users, update validation, and delete/reference behavior. Post-events must not be expected to cancel completed operations.

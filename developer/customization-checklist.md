@@ -16,6 +16,9 @@ The customization is complete in a development or staging environment. See [Work
 
 - Check the naming prefix, app, model, and layer.
 - Check dependencies whenever an object extends across apps.
+- Inspect the inherited read-only chain and confirm the saved Extension contains only the intended Layer delta.
+- Give Form groups/actions/Charts/lines and menu items stable IDs before targeting presentation overrides.
+- Confirm Enum and read-only fields are optional; verify read-only values through trusted code and rejected REST/Form edits.
 - Preview the change set and read every destructive or high-risk diff.
 - Test permissions with a real user account, not only an administrator.
 - Test dynamic lookups when the source is empty, when it changes, and when the referenced record is deleted.
@@ -25,6 +28,7 @@ The customization is complete in a development or staging environment. See [Work
 - If SMTP is configured, back up `.emu-secret.key` or `EMU_SECRET_KEY_PATH` separately.
 - Confirm the Docker volume/network names for each deployment's environment.
 - Export the app/model package or keep the metadata files in source control.
+- Test Function Extensions with and without `next(args)`, and test View/Chart Extensions against lower-layer changes.
 
 See [Back up databases](../admin/backup.md), [Understand database storage](../admin/database-storage.md), and [Operate Docker](../admin/docker-operations.md).
 

@@ -20,7 +20,9 @@ An application URL and an account provisioned by an administrator.
 4. Use the sidebar button to collapse navigation on a small screen.
 5. To change your password, open **My Account → Change Password**, enter the current password and a new password of at least 12 characters, then submit. Your old sessions are revoked and the current browser session is rotated.
 
-On small screens, action pickers, line grids, imports, and administrative table views use stacked record cards or scrollable content instead of wide desktop tables. Buttons are enlarged for touch use. In Report Designer, swipe horizontally inside the canvas area to reach the full report width.
+On desktop, expanding an App branch collapses the previously open branch. The browser remembers the last open branch for the current session. On mobile, navigation remains an overlay designed for touch.
+
+On small screens, form controls use a 16px input size to prevent automatic iPhone Safari zoom while preserving manual pinch-to-zoom. Action pickers, line grids, imports, and administrative table views use stacked record cards or scrollable content instead of wide desktop tables. In Report Designer, swipe horizontally inside the canvas area to reach the full report width.
 
 ## Expected result
 

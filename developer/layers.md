@@ -86,6 +86,10 @@ This adds a localized field to `SALES_Customer` without copying or replacing the
 - Only one Extension of a given kind may target the same base artifact from the same app and Model.
 - Do not depend on undocumented registration order between artifacts. Apps are now registered following their declared `dependsOn` graph (a dependency loads before any app that depends on it), with layer and name used only to order otherwise-unrelated apps.
 - Review schema effects before applying a layer change. Additive synchronization supports new tables, fields, and indexes; destructive changes require migration and backup planning.
+- Designer exposes lower layers as a read-only customization chain and saves only the selected Model's delta.
+- Stable IDs identify Form and Menu presentation elements across layers; overrides target an ID, not an array position.
+- Extension deltas may add structure or override supported presentation properties, but cannot replace properties omitted from that Extension kind's schema.
+- The v0.1.4.0 compatibility migration is idempotent, preserves audit copies, and does not change business records.
 
 ## Testing
 

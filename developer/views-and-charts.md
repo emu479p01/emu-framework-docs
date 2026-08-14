@@ -105,6 +105,26 @@ Use `{ "source": "record", "field": "customerId" }` when a View parameter should
 
 Apache ECharts is bundled locally; no CDN is required. The generated component resizes with its container and disposes its ECharts instance when removed.
 
+## Extend Views and Charts
+
+Use `viewExtension` to add joins, columns, filters, or sorting and to override output-column labels. It cannot replace the inherited source, parameters, or grouping structure.
+
+Use `chartExtension` to add measures, change `legend` or `stacked`, and override a measure's label or color. It cannot replace the inherited Chart type, View, or dimension. Both kinds save only the current Layer delta and must target a lower-layer artifact.
+
+```json
+{
+  "kind": "chartExtension",
+  "name": "SALES_Customizations_SALES_CustomerTotalsChart_Extension",
+  "app": "sales",
+  "model": "Customizations",
+  "layer": "CUS",
+  "chart": "SALES_CustomerTotalsChart",
+  "measureOverrides": [
+    { "field": "total", "label": "Net sales", "color": "#0f766e" }
+  ]
+}
+```
+
 ## Related topics
 
 [Metadata](metadata.md) · [Security](security.md) · [Web Designer](../user/web-designer.md) · [Power BI](../admin/power-bi-view-api.md)

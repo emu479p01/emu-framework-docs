@@ -36,7 +36,7 @@ Prefer the CLI or Web Designer over repetitive handwritten files. Validate relat
 
 ## Schema and database rules
 
-Schema synchronization is additive: adding tables, fields, and indexes is supported. Removing or changing existing structures needs an explicit migration and backup plan. Do not declare framework audit fields (`id`, `createdAt`, `createdBy`, `modifiedAt`, `modifiedBy`) as application fields.
+Schema synchronization is additive: adding tables, fields, and indexes is supported. Removing or changing existing structures needs an explicit migration and backup plan. Do not declare framework audit fields (`id`, `createdAt`, `createdBy`, `modifiedAt`, `modifiedBy`) as application fields. Enum fields and fields with `readOnly: true` must not also set `mandatory: true`.
 
 ## Procedure
 
@@ -96,7 +96,7 @@ A change set is the right tool when creating a Table + Form + Menu + Security gr
 
 ### Supported object kinds
 
-`app`, `table`, `enum`, `form`, `menu`, `script`, `function`, `report`, `view`, `chart`, `privilege`, `duty`, `role`, `tableExtension`, `enumExtension`, `formExtension`, `menuExtension`, `privilegeExtension`, `dutyExtension`, `roleExtension`, `scriptExtension`
+`app`, `table`, `enum`, `form`, `menu`, `script`, `function`, `report`, `view`, `chart`, `privilege`, `duty`, `role`, `tableExtension`, `enumExtension`, `formExtension`, `menuExtension`, `privilegeExtension`, `dutyExtension`, `roleExtension`, `scriptExtension`, `viewExtension`, `chartExtension`, `functionExtension`
 
 An App is created with `models: []`. Add a Model through Designer or CLI before creating other artifacts. System metadata appears only to a System Administrator in the **Framework — Read-only** scope and is rejected by every mutation and packaging endpoint.
 

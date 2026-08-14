@@ -32,7 +32,7 @@ The Designer supports these object kinds, including Extensions of the kinds that
 
 ## Tables and fields
 
-For each field, set its type, label, required flag, read-only flag, and whether it can be edited on create versus update. A reference field also sets the related table, display fields, on-delete behavior, and copy fields.
+For each field, set its type, label, required flag, read-only flag, and whether it can be edited on create versus update. Enum and read-only fields must be optional. Trusted Functions and Scripts can populate read-only fields, but REST writes and generated Forms cannot edit them. A reference field also sets the related table, display fields, on-delete behavior, and copy fields.
 
 ### Dynamic lookup filters
 
@@ -76,6 +76,7 @@ When the source field changes, any dropdown that depends on it reloads its optio
 - `groups` arranges fields on the detail page.
 - `charts` embeds reusable Chart artifacts after groups and before line grids.
 - `lines` builds a master-detail grid with aggregates and line-level actions.
+- Line create/update/delete operations show a confirmation dialog before committing.
 - A header action that should appear before the record is saved for the first time needs `showOnCreate: true`.
 
 ```json
@@ -126,7 +127,9 @@ Designer validates references, types, grouping, App dependencies, and protected 
 
 ## Extensions in the Designer
 
-Use an Extension when you need to add a field, form layout/action, menu item, enum value, or security metadata without changing the base object. The source layer must be strictly higher than the target layer, and extending across apps requires that app dependency to be declared. Use the Designer-generated Extension name to avoid duplicate names and to keep the target traceable. See [Create extensions](../developer/extensions.md) and [Work with metadata layers](../developer/layers.md).
+Use an Extension when you need to add or adjust metadata without changing the base object. The Designer shows the inherited customization chain as read-only and saves only the current Model/Layer delta. Table/Enum/Form/Menu Extensions support presentation overrides, while View, Chart, and Function Extensions add query, visualization, or Chain-of-Command behavior.
+
+The source layer must be strictly higher than the target layer, and extending across apps requires that app dependency to be declared. Use stable element IDs and the Designer-generated canonical Extension name so overrides survive lower-layer changes and duplicate targets are rejected. See [Create extensions](../developer/extensions.md) and [Work with metadata layers](../developer/layers.md).
 
 ## Expected result
 

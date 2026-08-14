@@ -48,6 +48,16 @@ When upgrading to v0.1.1.0, review the deny-by-default migration before opening 
 
 Migrations run once in a transaction and are recorded in the migration ledger. Restarting the upgraded version must not grant additional App Access or repeat legacy Model materialization.
 
+When upgrading through v0.1.2.0–v0.1.4.0:
+
+1. Confirm large App/Model packages import successfully and test forms on iPhone-sized screens.
+2. Export a Full backup with Data, Designer, and Fonts before updating. Preserve `.emu-secret.key` separately.
+3. After v0.1.3.0, verify **App Data Management** access and export one non-production App package. Test web restore only with a recovery copy available.
+4. After v0.1.4.0, review the layered-customization migration audit and diagnostics. Confirm inherited layers are read-only and that Extensions contain only the intended delta.
+5. Test legacy Extension names, stable Form/Menu element targeting, optional Enum/read-only fields, line confirmations, business grids, and mixed Thai/Latin PDFs.
+
+The v0.1.4.0 metadata migration is idempotent and does not modify business records. It may normalize field rules, add stable presentation IDs, and rename legacy Extensions to the canonical `<AppPrefix>_<ModelName>_<BaseName>_Extension` form when the name is unambiguous. Keep the pre-update Designer backup until the effective metadata has been reviewed.
+
 ## Manual fallback
 
 - Windows: run `Update.cmd`.

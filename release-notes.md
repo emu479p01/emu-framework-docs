@@ -2,6 +2,43 @@
 
 These notes describe the changes since v0.1.0.0 that affect users, administrators, and application developers.
 
+## v0.1.4.0
+
+### Layered customization and migration
+
+- Designer now shows inherited layers as read-only and saves only the current Layer delta. Tables, Enums, Forms, Menus, Views, Charts, Privileges, Duties, Roles, Scripts, and Functions can be customized through Extensions.
+- New `viewExtension`, `chartExtension`, and `functionExtension` kinds join the existing Extension kinds. Presentation overrides can change labels, visibility, order, icons, field editability, and chart measure presentation without copying a base artifact.
+- Form groups, actions, Charts, lines, and menu items use stable element IDs so higher-layer overrides continue to target the intended element after lower layers change.
+- The one-time `v0.1.4.0-layered-customization` migration normalizes legacy metadata, canonicalizes Extension names when safe, records audit copies, and is idempotent. Business records are not changed.
+
+### Business UI and reports
+
+- Enum and read-only fields must be optional. Read-only values remain writable from trusted Functions and Scripts, but generated Forms and REST writes cannot edit them.
+- Form line create/update/delete actions now require confirmation. A reusable two-axis business grid adds sticky headers and row/column actions for dense business data.
+- PDF rendering uses grapheme-safe, glyph-aware fallback for mixed Thai and Latin text.
+
+Before upgrading, export a Full backup and retain `.emu-secret.key` separately. After upgrading, inspect migration diagnostics, open every inherited customization, and test read-only fields, line actions, Views, Charts, Functions, and mixed-language reports.
+
+## v0.1.3.0
+
+### App data management and web restore
+
+- Framework administrators can export, replace, or permanently delete all business data owned by one App under **Settings → App Data Management**.
+- `.emuappdata` packages preserve record IDs and validate the App name, framework compatibility, checksums, table schemas, and cross-App references. Replace is atomic and bypasses per-record business hooks.
+- System Maintenance can export and restore Full, Data, Designer, or Fonts `.emubackup` packages. Restore preview validates checksums and SQLite integrity before confirmation.
+- Windows and Docker restores stop, replace, restart, health-check, and roll back automatically. Restoring Data also restores users, security, and sessions from that backup.
+- Desktop App navigation uses a one-branch accordion and remembers the last open branch for the browser session. Mobile navigation remains unchanged.
+
+See [Manage application data](admin/app-data-management.md), [Back up databases](admin/backup.md), and [Restore databases](admin/restore.md).
+
+## v0.1.2.0
+
+### Mobile usability and portable packages
+
+- Form controls use a mobile-safe 16px input size so iPhone Safari does not zoom automatically when a field receives focus; manual pinch-to-zoom remains available.
+- App and Settings icons stay centered when the desktop sidebar is collapsed.
+- App and Model metadata packages can be imported up to 20 MB, allowing larger framework exports to be imported again.
+
 ## v0.1.1.0
 
 ### Deny-by-default security
