@@ -1,37 +1,11 @@
-# Install on Windows
+# Windows installation is no longer supported
 
-## Purpose
+Starting with v0.5.0.0, EmuFramework production deployment is Docker-only. The Windows host launcher, portable runtime, installer, and host update/restore scripts have been removed.
 
-Run a release without installing Node.js globally.
+On a Windows workstation or server, install Docker Desktop or another supported Docker Engine environment and follow [Install with Docker](docker-install.md). Keep `data.db`, `designer.db`, and `.emu-secret.key` in the persistent `/data` volume; do not run an older Windows process against the same databases.
 
-## Audience
-
-Windows operators and framework administrators.
-
-## Prerequisites
-
-A writable Windows folder and permission to run the release launcher.
-
-## Procedure
-
-1. Download and extract the latest release to a writable folder.
-2. Run `RunApp.cmd`; allow the first run to download the pinned toolchain.
-3. Open the displayed URL. On first run, the app redirects to **Administrator setup**.
-4. Copy the one-time setup code from the **Emu-Server** window, then enter it on the setup page.
-5. Choose an administrator username and display name. The username must contain 3–60 letters, numbers, dots, underscores, or hyphens.
-6. Set a password of at least 12 characters and complete setup.
-7. Create and validate a backup.
-
-The setup code expires after 15 minutes or ten failed attempts. Restart the server to generate a new code. An upgrade that detects the legacy `admin` / `admin` credentials requires a password reset and keeps the username `admin`.
-
-Use `status.cmd` to inspect the app and `StopApp.cmd` to stop it.
-
-## Common errors
-
-- A proxy or firewall may block the first toolchain download.
-- Port 3399 or 5199 may already be in use.
-- If the setup code expired, stop and restart the app, then use the newly printed code.
+For migration, stop the Windows process, create and verify a Full backup, preserve `.emu-secret.key` separately, and follow the existing-installation steps in the Docker guide.
 
 ## Related topics
 
-[Configuration](configuration.md) · [Framework update](framework-update.md)
+[Docker installation](docker-install.md) · [Framework update](framework-update.md) · [Restore](restore.md)

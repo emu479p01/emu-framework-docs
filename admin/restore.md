@@ -22,7 +22,7 @@ A validated `.emubackup`, Framework Administrator access, and a separate copy of
 6. Verify apps, recent records, Designer customizations, reports/fonts, and **Settings → SMTP Settings** for the components restored.
 7. Verify the SMTP connection and send a test email. If the original key is unavailable, save the SMTP password again to encrypt it with the current key.
 
-On supported Windows and Docker deployments the restore coordinator stages the validated files, stops the app, replaces only the selected components, restarts it, and performs a health check. If replacement or restart fails, it restores the pre-restore files and attempts to restart the previous state.
+On the supported Docker deployment, the updater sidecar stages the validated files, stops the app, replaces only the selected components, restarts it, and performs a health check. If replacement or restart fails, it restores the pre-restore files and attempts to restart the previous state.
 
 Never replace a live SQLite file manually. Do not mix components from different backup generations unless you have verified their compatibility. A `.emubackup` never contains the integration secret key; recover it separately.
 

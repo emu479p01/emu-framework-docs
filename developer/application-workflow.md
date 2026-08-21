@@ -8,7 +8,7 @@ Create a coherent metadata-driven application in the order required by its refer
 
 - A working development environment; see [Set up a development environment](setup.md).
 - A stable application name and artifact naming convention.
-- A decision about whether metadata is source-controlled or owned by Web Designer.
+- A decision about how App/Model package exports will be reviewed and promoted between environments.
 
 ## Build order
 
@@ -35,7 +35,7 @@ Create the App first; it starts with zero Models. Add and select a Model before 
 
 ## Procedure
 
-1. Create the App with the CLI or Web Designer and verify that it has no implicit Model.
+1. Create the App with Web Designer and verify that it has no implicit Model. AI tokens can target only Apps that already exist.
 2. Add its Models, dependencies, and Layer ownership explicitly.
 3. Define enums, tables, fields, references, and indexes.
 4. Define Views and Charts when the App needs reusable queries or visualizations.
@@ -44,11 +44,11 @@ Create the App first; it starts with zero Models. Add and select a Model before 
 7. Choose the smallest business-logic mechanism for each rule.
 8. Validate metadata, App/Model scope, and cross-references.
 9. Test generated lists, Forms, Charts, actions, permissions, and database effects.
-10. Export a package or commit the source-controlled metadata.
+10. Export an App or Model package and commit it when the metadata needs source review or promotion.
 
-## Source-controlled versus Web Designer metadata
+## Review and promotion
 
-Use file-based metadata for application definitions that require code review, repeatable deployment, and version control. Use Web Designer for runtime or customer-owned customization. Both paths must obey the same metadata schema, security policy, and extension boundaries.
+Use Web Designer for human authoring and reviewed AI REST proposals for automated assistance inside an existing App. Export App or Model packages when definitions require code review, repeatable promotion, and version control. Every path obeys the same metadata schema, security policy, and Extension boundaries.
 
 ## Related topics
 

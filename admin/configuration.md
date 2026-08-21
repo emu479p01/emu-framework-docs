@@ -10,7 +10,7 @@ Deployment operators and framework administrators.
 
 ## Prerequisites
 
-Access to the Windows launcher or Docker environment and permission to restart the application.
+Access to the Docker deployment and permission to recreate the application containers.
 
 ## Settings
 
@@ -24,11 +24,13 @@ Access to the Windows launcher or Docker environment and permission to restart t
 | `EMU_SECURE_COOKIES` | Require HTTPS cookies | production dependent |
 | `EMU_VIEW_CSV_MAX_ROWS` | Maximum rows in one View CSV export | `100000` |
 | `EMU_UPDATER_TOKEN` | App-to-sidecar secret | required for Docker update |
+| `EMU_UPDATER_URL` | Internal updater URL used by the app | `http://updater:3400` in Compose |
 | `EMU_APP_CONTAINER` | Updater-only: name of the app container to restart | required for Docker update |
 | `EMU_IMAGE_REPOSITORY` | Updater-only: app image repository to pull | `ghcr.io/emu479p01/emu-framework` |
 | `EMU_UPDATE_STATE_PATH` | Updater-only: path to the update status file | `/data/update-status.json` |
+| `EMU_RESTORE_STATE_PATH` | Restore job status file shared with the updater | `/data/restore-status.json` |
 
-Restart the app after changing environment values. Use HTTPS and `EMU_SECURE_COOKIES=true` on an internet-facing deployment.
+Recreate the app container after changing environment values. Use HTTPS and `EMU_SECURE_COOKIES=true` on an internet-facing deployment. `EMU_UPDATER_TOKEN` must contain at least 24 characters and must match in the app and updater containers.
 
 View JSON endpoints always cap one page at 10,000 rows. `EMU_VIEW_CSV_MAX_ROWS` controls the separate CSV export cap used by Power BI and other integrations; choose a limit that fits available memory and request time.
 

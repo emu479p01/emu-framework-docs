@@ -1,8 +1,8 @@
-# Customization checklist and beta cautions
+# Customization checklist and cautions
 
 ## Purpose
 
-Verify a customization — built through the Web Designer, the Metadata API, files/CLI, or Functions/Scripts/native TypeScript — before it reaches production.
+Verify a customization — built through Web Designer, a reviewed AI proposal, exported metadata, or Functions/Scripts/native TypeScript — before it reaches production.
 
 ## Audience
 
@@ -17,6 +17,7 @@ The customization is complete in a development or staging environment. See [Work
 - Check the naming prefix, app, model, and layer.
 - Check dependencies whenever an object extends across apps.
 - Inspect the inherited read-only chain and confirm the saved Extension contains only the intended Layer delta.
+- For Form Extensions, inspect every `lineOverrides` delta and test reset-to-inherited behavior.
 - Give Form groups/actions/Charts/lines and menu items stable IDs before targeting presentation overrides.
 - Confirm Enum and read-only fields are optional; verify read-only values through trusted code and rejected REST/Form edits.
 - Preview the change set and read every destructive or high-risk diff.
@@ -32,7 +33,7 @@ The customization is complete in a development or staging environment. See [Work
 
 See [Back up databases](../admin/backup.md), [Understand database storage](../admin/database-storage.md), and [Operate Docker](../admin/docker-operations.md).
 
-## Cautions during beta
+## Cautions
 
 - Deleting metadata does not immediately delete the underlying physical business data; an orphaned table must be purged deliberately.
 - Functions and Scripts are executable code — restrict who can edit them and review every change. See [Develop Functions and actions](functions.md) and [Develop Scripts](scripts.md).

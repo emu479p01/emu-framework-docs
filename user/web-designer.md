@@ -22,6 +22,8 @@ Your account needs Designer permission for the target app.
 6. Save, review the generated change set, and apply it.
 7. Open the App and verify the Form and list with a separately authorized runtime account.
 
+Artifact lists are paginated and filterable by App, Model, and kind. In a large workspace, move through every page or narrow the filters instead of assuming the first page contains every Artifact.
+
 ## Recommended customization order
 
 Work through objects in this order so each step can reference the ones before it: **App → Model → Object → Menu → Privilege/Duty/Role**.
@@ -113,6 +115,8 @@ The report canvas keeps its document width so element positions remain stable. O
 
 `Noto Sans Thai` is bundled and available without a Google Fonts API key. PDF output automatically selects it for Thai text.
 
+Detail and Line bands can use either Freeform or Tablix layout. Tablix provides columns, formatting, header/row styles, repeated headers, and native page planning. Header and Footer bands can render on the first, every, or last page. See [Design paginated Reports](../developer/reports.md).
+
 ## Menus and the sidebar
 
 - Level 1 menu items are the primary sidebar entries.
@@ -129,7 +133,11 @@ Designer validates references, types, grouping, App dependencies, and protected 
 
 Use an Extension when you need to add or adjust metadata without changing the base object. The Designer shows the inherited customization chain as read-only and saves only the current Model/Layer delta. Table/Enum/Form/Menu Extensions support presentation overrides, while View, Chart, and Function Extensions add query, visualization, or Chain-of-Command behavior.
 
-The source layer must be strictly higher than the target layer, and extending across apps requires that app dependency to be declared. Use stable element IDs and the Designer-generated canonical Extension name so overrides survive lower-layer changes and duplicate targets are rejected. See [Create extensions](../developer/extensions.md) and [Work with metadata layers](../developer/layers.md).
+The source layer must be strictly higher than the target layer, and extending across apps requires that app dependency to be declared. Use the Designer-generated canonical Extension name so overrides survive lower-layer changes and duplicate targets are rejected. Form Extensions can add Line grids and edit inherited Line fields, aggregates, actions, label, visibility, and order; only the current Layer's `lineOverrides` delta is saved. See [Create extensions](../developer/extensions.md) and [Work with metadata layers](../developer/layers.md).
+
+## Review AI proposals
+
+Open **Web Designer → AI Proposals** to inspect pending ChangeSets submitted through the AI REST API. Review the affected Apps, executable Scripts/Functions, diagnostics, and complete diff. Approval revalidates against the current metadata revision; a stale or invalid proposal is not applied. Reject proposals that exceed the intended scope.
 
 ## Expected result
 

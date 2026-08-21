@@ -24,15 +24,18 @@ flowchart LR
 
 - [Framework architecture](architecture.md)
 - [Set up a development environment](setup.md)
-- [Use the CLI](cli.md)
 
 ## Concepts
 
 - [Work with metadata](metadata.md)
+- [Create Artifacts through the API](artifact-api.md)
+- [Artifact kind reference](artifact-types.md)
+- [Nested metadata structures](artifact-components.md)
 - [Understand Apps, Models, and Layers](app-model-layer.md)
 - [Work with metadata layers](layers.md)
 - [Build an application](application-workflow.md)
 - [Build Views and embedded Charts](views-and-charts.md)
+- [Design paginated Reports](reports.md)
 - [Create extensions](extensions.md)
 - [Use hooks and data events](hooks-events.md)
 
@@ -48,7 +51,7 @@ flowchart LR
 - [Understand security](security.md)
 - [Run tests and debug](testing.md)
 - [Review future major dependency upgrades](dependency-upgrades.md)
-- [Use AI and MCP tools](ai-mcp.md)
+- [Integrate AI through the REST proposal API](ai-rest-api.md)
 
 ## Documentation conventions
 

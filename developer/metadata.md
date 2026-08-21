@@ -32,7 +32,7 @@ Metadata is resolved through ordered layers: `SYS < ISV < LOC < DEV < CUS`. Base
 
 Applications contain named Models, and Models provide the organizational and ownership context for their metadata. Review [Understand Apps, Models, and Layers](app-model-layer.md) before deciding where an artifact belongs.
 
-Prefer the CLI or Web Designer over repetitive handwritten files. Validate relationships, enum values, menu targets, action targets, and security artifacts together.
+Prefer Web Designer or a reviewed AI REST proposal over repetitive handwritten payloads. Validate relationships, enum values, menu targets, action targets, and security Artifacts together.
 
 ## Schema and database rules
 
@@ -48,7 +48,11 @@ Schema synchronization is additive: adding tables, fields, and indexes is suppor
 
 ## Metadata API
 
-The API requires an authenticated session with Designer/customize permission for the target app. It is the channel used by integrations, automation, and deployment pipelines.
+These session-cookie endpoints are the internal interface used by Web Designer. They require Designer/Customize permission for the target App and are not the external AI integration contract. External AI clients must use the scoped [AI REST proposal API](ai-rest-api.md), which never applies changes directly.
+
+For the complete request flow, required properties, status codes, and ChangeSet confirmation contract, read [Create metadata Artifacts through the API](artifact-api.md). Use [Artifact kind reference](artifact-types.md) for every supported `kind` and [Nested metadata structures](artifact-components.md) for Fields, actions, Line grids, menu items, Report bands, View expressions, and Extension overrides.
+
+`GET /api/designer/artifacts` supports `app`, `model`, `kind`, `cursor`, and `limit` query parameters, returns `nextCursor` and `total`, and emits an ETag based on the metadata revision. Request `includeCatalog=false` when the caller needs only the stored Artifact page; use `/api/designer/catalog` for the separately cached effective catalog.
 
 ### Create an object
 
@@ -81,7 +85,7 @@ A successful response returns status `201`.
 PUT /api/designer/artifacts/{kind}/{name}
 ```
 
-Use this when an integration needs to upsert the same object repeatedly. The `kind` and `name` in the URL are authoritative.
+Web Designer uses this operation when it needs to save the same object idempotently. The `kind` and `name` in the URL are authoritative.
 
 ### Create multiple objects atomically
 
@@ -98,10 +102,10 @@ A change set is the right tool when creating a Table + Form + Menu + Security gr
 
 `app`, `table`, `enum`, `form`, `menu`, `script`, `function`, `report`, `view`, `chart`, `privilege`, `duty`, `role`, `tableExtension`, `enumExtension`, `formExtension`, `menuExtension`, `privilegeExtension`, `dutyExtension`, `roleExtension`, `scriptExtension`, `viewExtension`, `chartExtension`, `functionExtension`
 
-An App is created with `models: []`. Add a Model through Designer or CLI before creating other artifacts. System metadata appears only to a System Administrator in the **Framework — Read-only** scope and is rejected by every mutation and packaging endpoint.
+An App is created with `models: []`. Add a Model through Designer before creating other Artifacts. System metadata appears only to a System Administrator in the **Framework — Read-only** scope and is rejected by every mutation and packaging endpoint.
 
 Every API channel validates schema, naming, app/model/layer, dependencies, cross-references, and permissions before saving.
 
 ## Related topics
 
-[CLI](cli.md) · [Security](security.md) · [Views and Charts](views-and-charts.md) · [Web Designer](../user/web-designer.md) · [Customization checklist](customization-checklist.md)
+[Artifact API](artifact-api.md) · [Artifact kinds](artifact-types.md) · [Nested structures](artifact-components.md) · [AI REST API](ai-rest-api.md) · [Security](security.md) · [Web Designer](../user/web-designer.md)

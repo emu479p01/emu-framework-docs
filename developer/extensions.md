@@ -48,6 +48,8 @@ An Extension stores only the current Layer delta. Inherited metadata remains rea
 
 Form groups, actions, Charts, lines, and menu items should have stable `id` values. Target those IDs rather than array positions so a lower-layer insertion or reordering does not redirect a customization.
 
+Form Line editing also uses `lineOverrides`. It can override inherited fields, aggregates, actions, label, visibility, and order, or add a new Line grid while saving only the current Layer delta.
+
 `functionExtension` supplies Chain-of-Command code. Call `next(args)` to continue the inherited implementation; review it as executable code and test both the extended and base paths.
 
 ## Prerequisites
@@ -59,11 +61,11 @@ Form groups, actions, Charts, lines, and menu items should have stable `id` valu
 
 ## Procedure
 
-1. Create the Extension with the CLI or define it in Web Designer.
+1. Create the Extension in Web Designer or submit it through a reviewed AI proposal.
 2. Declare the target application dependency.
 3. Add only the fields, indexes, menu items, permissions, or behavior required by the feature.
 4. Validate target references and the generated change set.
-5. Apply the change set or commit the source-controlled metadata.
+5. Apply the ChangeSet and export the App/Model package when it requires source review or promotion.
 6. Test with the Extension enabled and disabled.
 7. Confirm that removing the Extension leaves the base application understandable and deployable.
 
@@ -85,13 +87,13 @@ Form groups, actions, Charts, lines, and menu items should have stable `id` valu
 }
 ```
 
-## File-based and Web Designer Extensions
+## Review and promotion
 
-Use file-based Extensions for reviewed, repeatable, source-controlled application definitions. Use Web Designer for runtime or customer-owned customization. Both forms use the same schema and must remain independently removable.
+Create Extensions in Web Designer or submit them through a reviewed AI proposal. Export the containing App or Model package for a repeatable, source-controlled promotion. Every form uses the same schema and the Extension must remain independently removable.
 
 ## Naming, ordering, and removal
 
-Names are stable identifiers and must be unique. The canonical form is `<AppPrefix>_<ModelName>_<BaseName>_Extension`; the CLI and Web Designer derive this automatically from the extending app, the source Model, and the target artifact. The v0.1.4.0 migration renames an older `<AppPrefix>_<BaseName>_Extension` form when the canonical target is unambiguous and available. A legacy name that cannot be migrated remains supported with a registry/change-set warning so it can be addressed deliberately.
+Names are stable identifiers and must be unique. The canonical form is `<AppPrefix>_<ModelName>_<BaseName>_Extension`; Web Designer derives this from the extending App, source Model, and target Artifact. The v0.1.4.0 migration renames an older `<AppPrefix>_<BaseName>_Extension` form when the canonical target is unambiguous and available. A legacy name that cannot be migrated remains supported with a registry/change-set warning so it can be addressed deliberately.
 
 Only one Extension of a given kind may target the same base artifact from the same app and Model; the registry rejects a second `tableExtension`, `formExtension`, and so on for an identical `(app, model, kind, target)` combination.
 
@@ -111,4 +113,4 @@ Validate schema and cross-references, test generated forms/lists/menus, verify a
 
 ## Related topics
 
-[Application workflow](application-workflow.md) · [Metadata](metadata.md) · [Scripts](scripts.md) · [CLI](cli.md) · [Security](security.md) · [Customization checklist](customization-checklist.md)
+[Application workflow](application-workflow.md) · [Metadata](metadata.md) · [Scripts](scripts.md) · [AI REST API](ai-rest-api.md) · [Security](security.md) · [Customization checklist](customization-checklist.md)

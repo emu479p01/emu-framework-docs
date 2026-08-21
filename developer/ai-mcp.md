@@ -1,17 +1,9 @@
-# Use AI and MCP tools
+# MCP has been replaced by the AI REST proposal API
 
-The `@emu/mcp` package exposes framework catalog context to compatible AI development tools. Start it with the command configured by your MCP client and keep access local to the development workspace.
+The `@emu/mcp` package was removed in v0.5.0.0. Do not configure a local MCP process for current EmuFramework releases.
 
-## Audience
-
-Developers using AI-assisted development tools.
-
-## Prerequisites
-
-The MCP package and a compatible local MCP client configured for the development workspace.
-
-AI-generated changes follow the same contract as human changes: use change sets, preserve extension boundaries, inspect generated metadata, never expose credentials or production data, and run the complete verification suite.
+Use the versioned [AI REST proposal API](ai-rest-api.md) instead. It provides scoped metadata inspection, JSON schemas, ChangeSet validation, and proposal submission while deliberately exposing neither business records nor an apply endpoint.
 
 ## Related topics
 
-[Metadata](metadata.md) · [Testing](testing.md)
+[AI REST API](ai-rest-api.md) · [Security](security.md) · [Testing](testing.md)

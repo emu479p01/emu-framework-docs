@@ -4,7 +4,7 @@
 
 Documentation for [EmuFramework](https://github.com/emu479p01/emu-framework), maintained in the dedicated [emu-framework-docs repository](https://github.com/emu479p01/emu-framework-docs). Choose a learning path by role, then use the focused concept, how-to, and reference pages.
 
-Current framework version: **0.1.4.0 (Beta)**
+Current framework version: **0.5.0.0**
 
 - [Release notes](release-notes.md)
 
@@ -15,7 +15,6 @@ Current framework version: **0.1.4.0 (Beta)**
 
 ## Administrator
 
-- [Install on Windows](admin/windows-install.md)
 - [Install with Docker](admin/docker-install.md)
 - [Configure the application](admin/configuration.md)
 - [Manage users and application access](admin/user-security.md)
@@ -40,6 +39,9 @@ Current framework version: **0.1.4.0 (Beta)**
 ### Concepts and implementation
 
 - [Work with metadata](developer/metadata.md)
+- [Create Artifacts through the API](developer/artifact-api.md)
+- [Artifact kind reference](developer/artifact-types.md)
+- [Nested metadata structures](developer/artifact-components.md)
 - [Understand Apps, Models, and Layers](developer/app-model-layer.md)
 - [Work with metadata layers](developer/layers.md)
 - [Build an application](developer/application-workflow.md)
@@ -50,13 +52,13 @@ Current framework version: **0.1.4.0 (Beta)**
 - [Add business logic](developer/business-logic.md)
 - [Understand security](developer/security.md)
 - [Build Views and embedded Charts](developer/views-and-charts.md)
+- [Design paginated Reports](developer/reports.md)
 - [Customization checklist](developer/customization-checklist.md)
 
 ### Tools, testing, and operations
 
-- [Use the CLI](developer/cli.md)
 - [Run tests and debug](developer/testing.md)
-- [Use AI and MCP tools](developer/ai-mcp.md)
+- [Integrate AI through the REST proposal API](developer/ai-rest-api.md)
 - [Review future major dependency upgrades](developer/dependency-upgrades.md)
 
 ## Contributing

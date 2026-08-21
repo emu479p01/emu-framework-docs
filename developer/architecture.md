@@ -16,7 +16,7 @@ Basic familiarity with TypeScript, SQLite, and metadata-driven applications.
 
 ```mermaid
 flowchart TD
-    A[File metadata or Web Designer artifact] --> B[Schema validation]
+    A[Web Designer artifact or reviewed AI proposal] --> B[Schema validation]
     B --> C[Metadata registry]
     C --> D[Kernel registration]
     D --> E[Additive SQLite synchronization]
@@ -32,9 +32,11 @@ flowchart TD
 
 ## Runtime layers
 
-EmuFramework is a pnpm workspace with four runtime layers: core metadata and database services, the Fastify API, the Vue client, and application metadata. The CLI scaffolds metadata, while the MCP package exposes development context to compatible AI tools.
+EmuFramework is a pnpm workspace with three packages: `@emu/core` for metadata, SQLite access, schema synchronization, and security; `@emu/server` for Fastify APIs and runtime services; and `@emu/client` for the Vue application and Web Designer.
 
-The kernel loads code metadata, synchronizes additive SQLite schema changes, loads Designer artifacts, registers business logic, and enforces security. `data.db` stores business and system records; `designer.db` stores browser-created artifacts.
+The kernel resolves metadata with a single-pass dependency pipeline, reuses content-hash results, synchronizes only affected tables, registers business logic, and enforces security. `data.db` stores business and system records; `designer.db` stores browser-created Artifacts, Designer state, AI tokens, proposals, and audit records.
+
+Production execution is Docker-only. Local Node.js commands are for framework development and verification, not for running a production host.
 
 ## Design rules
 

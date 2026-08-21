@@ -59,6 +59,12 @@ POST   /api/account/change-password
 
 System Administrator authority is determined only by the `FW_SystemAdminRole` assignment. A username such as `admin` has no implicit privilege.
 
+## Manage AI REST tokens
+
+Open the **AI REST tokens** tab to create a dedicated integration token. Select existing non-system Apps, grant only the required `inspect`, `validate`, or `propose` scopes, and set an expiry. Copy the secret when it is issued; it cannot be displayed again because only its hash is stored.
+
+AI tokens do not inherit user Roles, cannot read business records, and cannot apply metadata. They can inspect only their allowed Apps and submit ChangeSets to the Designer Proposal Inbox for human review. Revoke a token immediately when it is no longer needed or may have leaked.
+
 ## Related topics
 
-[Security model](../developer/security.md) · [Power BI View tokens](power-bi-view-api.md) · [Sign in and navigate](../user/getting-started.md)
+[Security model](../developer/security.md) · [AI REST API](../developer/ai-rest-api.md) · [Power BI View tokens](power-bi-view-api.md) · [Sign in and navigate](../user/getting-started.md)

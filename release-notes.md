@@ -2,6 +2,52 @@
 
 These notes describe the changes since v0.1.0.0 that affect users, administrators, and application developers.
 
+## v0.5.0.0
+
+### Scale and Web Designer
+
+- A single Docker instance now supports 5,000+ mixed metadata Artifacts through a single-pass dependency pipeline, content-hash caching, affected-table schema synchronization, indexed Designer metadata, and incremental persistence.
+- Artifact listing is paginated separately from the effective catalog, supports App/Model/kind filters and ETags, and keeps large Designer workspaces responsive.
+- Form Extensions can add Line grids or override inherited line fields, aggregates, actions, labels, visibility, and order while persisting only the current Layer's `lineOverrides` delta.
+
+### AI proposal workflow
+
+- Scoped, versioned AI REST endpoints replace the removed MCP package. AI clients can inspect metadata, read schemas, validate ChangeSets, and submit proposals containing any supported Artifact, including Scripts and Functions.
+- AI tokens are hashed, optionally expiring and revocable, restricted to selected Apps, and scoped to `inspect`, `validate`, and `propose`.
+- AI cannot apply a ChangeSet or read business records. A customizer must review, revalidate, approve, or reject each proposal in the Designer Proposal Inbox; token and review activity is audited.
+
+### Runtime and database operations
+
+- Production deployment is Docker-only. The user CLI, MCP package, Windows host launchers/installers, and host update/restore scripts have been removed.
+- SQLite remains the only database. Both `data.db` and `designer.db` use WAL, foreign keys, a 5-second busy timeout, automatic checkpoints, and integrity diagnostics.
+- Documented v0.1.x metadata, Function, Script, backup, and synchronous `DataContext` behavior remains compatible. Direct access to private handles such as `kernel.db.prepare()` is not a compatibility guarantee.
+
+Before upgrading, stop every older writer, create a Full backup, and preserve `.emu-secret.key` separately. After migration, verify login, important business records, Scripts/Functions, inherited Form Lines, the Proposal Inbox, and **Settings → System Maintenance** database diagnostics.
+
+## v0.1.6.1
+
+### Paginated report fixes
+
+- Header and Footer space is reserved only on pages where the configured `displayOn` policy renders the band.
+- Freeform Detail and Line rows remain atomic when moved across a page break; each main Detail is followed by its Line sources.
+- Tablix pagination honors `headerHeight` and `rowHeight`, repeats headers after page breaks, and keeps Footer coordinates inside the physical page.
+
+## v0.1.6.0
+
+### Menu Extension editor
+
+- The Designer shows inherited and current-Layer menu items in one effective tree while saving only the current Layer delta.
+- Menu Extensions support visibility, target and order overrides, reset-to-inherited, and `parentId` anchors for added items.
+- Stable IDs remain in metadata and backups but are hidden from the normal visual editor. Visibility is applied before privilege filtering and never grants authorization.
+
+## v0.1.5.0
+
+### Business tables and reports
+
+- Desktop and mobile record lists use the same horizontally scrollable table with visible remote pagination.
+- Menu Extensions can insert delta-only items into inherited submenus through stable-ID paths.
+- Paginated reports add Tablix Detail and Line layouts, repeated headers, field formatting, native PDF pagination, and unified Header/Footer display policies.
+
 ## v0.1.4.0
 
 ### Layered customization and migration
@@ -26,7 +72,7 @@ Before upgrading, export a Full backup and retain `.emu-secret.key` separately. 
 - Framework administrators can export, replace, or permanently delete all business data owned by one App under **Settings → App Data Management**.
 - `.emuappdata` packages preserve record IDs and validate the App name, framework compatibility, checksums, table schemas, and cross-App references. Replace is atomic and bypasses per-record business hooks.
 - System Maintenance can export and restore Full, Data, Designer, or Fonts `.emubackup` packages. Restore preview validates checksums and SQLite integrity before confirmation.
-- Windows and Docker restores stop, replace, restart, health-check, and roll back automatically. Restoring Data also restores users, security, and sessions from that backup.
+- Docker restores stop, replace, restart, health-check, and roll back automatically. Restoring Data also restores users, security, and sessions from that backup.
 - Desktop App navigation uses a one-branch accordion and remembers the last open branch for the browser session. Mobile navigation remains unchanged.
 
 See [Manage application data](admin/app-data-management.md), [Back up databases](admin/backup.md), and [Restore databases](admin/restore.md).
@@ -55,7 +101,7 @@ See [Manage users and application access](admin/user-security.md) and the comple
 
 - Every new App starts with `models: []`, including Apps named `erp`, `erp.credit`, or `web`. No App name creates a hidden or default Model.
 - Add a named Model and choose its Layer before creating artifacts. App is the runtime access and navigation boundary; Model groups development metadata and is not a security boundary.
-- Designer and CLI object creation require an explicit App and Model. The CLI adds `pnpm emu add model <app> <name> --layer <layer>`.
+- Designer object creation requires an explicit App and Model.
 - Framework metadata is shown to System Administrators in a separate **Framework — Read-only** area and cannot be edited, deleted, imported, exported, or extended.
 
 Upgrade migrations materialize Models referenced by legacy artifacts and preserve old ERP/web metadata only for upgraded data. The one-time migration ledger prevents a later boot from granting access or recreating legacy Models again.
@@ -123,4 +169,4 @@ The application shell, action picker, master-detail line grids, import workflow,
 
 ## Related topics
 
-[Install on Windows](admin/windows-install.md) · [Install with Docker](admin/docker-install.md) · [Configuration](admin/configuration.md) · [Functions and actions](developer/functions.md) · [Security](developer/security.md) · [Views and Charts](developer/views-and-charts.md)
+[Install with Docker](admin/docker-install.md) · [Configuration](admin/configuration.md) · [AI REST API](developer/ai-rest-api.md) · [Functions and actions](developer/functions.md) · [Security](developer/security.md) · [Views and Charts](developer/views-and-charts.md)

@@ -2,71 +2,65 @@
 
 ## Purpose
 
-Install the latest stable GitHub Release while preserving apps and databases.
+Install a newer stable Docker image while preserving the named data volume and a verified recovery point.
 
 ## Audience
 
-Framework administrators and deployment operators.
+Framework administrators and Docker operators.
 
 ## Update flow
 
 ```mermaid
 flowchart TD
-    A[Verified backup] --> B[Check release and compatibility]
-    B --> C[Download Windows files or Docker image]
-    C --> D[Replace framework container/files]
+    A[Full backup and separate secret key copy] --> B[Review release and compatibility]
+    B --> C[Docker updater pulls immutable app image]
+    C --> D[Replace app container with same volume]
     D --> E[Health check]
-    E -->|Pass| F[Verify login, apps, and records]
-    E -->|Fail| G[Restore previous framework version]
+    E -->|Pass| F[Verify migration, login, Apps, and records]
+    E -->|Fail| G[Updater restores previous container]
     G --> H[Inspect logs and recovery backup]
-    F --> I[Keep pre-update backup until verified]
+    F --> I[Keep recovery material until accepted]
 ```
 
 ## Web procedure
 
-1. Sign in as a Framework Administrator.
-2. Open **System Maintenance** and choose **Check for updates**.
-3. Review the version and release notes.
-4. Choose **Update to latest stable** and confirm downtime.
-5. Keep the page open while it reconnects and verify the final status.
+1. Confirm both Compose services are healthy and the app can reach `http://updater:3400`.
+2. Export a Full `.emubackup` and copy `/data/.emu-secret.key` (or `EMU_SECRET_KEY_PATH`) to separate secure storage.
+3. Sign in with `FW_SystemAdminRole`, open **Settings → System Maintenance**, and run database diagnostics.
+4. Choose **Check for updates**, review the target version and release notes, then start the update.
+5. Keep the page open while the app reconnects. Confirm the job reaches `succeeded`.
+6. Verify login, recent business records, Designer metadata, important Scripts/Functions, reports, integrations, and database diagnostics.
 
-The system creates and validates a `.emubackup` before starting. Windows verifies release SHA-256; Docker pulls the immutable GHCR version tag and restores the previous container if health checks fail.
+The app creates a validated pre-update `.emubackup` under `/data/backups` before dispatching the job. The updater sidecar pulls the target image, recreates the app container with the existing configuration and `/data` volume, and waits for a health check. If the new container is unhealthy, it attempts to restore the previous container image.
 
-For Docker, the app contacts the internal updater service using `EMU_UPDATER_URL` and `EMU_UPDATER_TOKEN`. The updater controls Docker through the mounted Docker socket, pulls the target app image, replaces the app container, and checks its health. The updater itself does not need a published host port.
+Container rollback does not reverse database migrations. Keep the pre-update backup and secret key until the new version and its data are accepted.
 
-The persistent `emu-data` volume is reused by the replacement container. Container rollback does not roll back database contents; keep the pre-update `.emubackup` until the new version has been verified.
+## Upgrade to v0.5.0.0
 
-When upgrading to v0.1.0.2, complete **Administrator setup** if the server detects the legacy `admin` / `admin` credentials or no enabled user with `FW_SystemAdminRole`. The automatic `.emubackup` does not include `.emu-secret.key`: preserve that key separately, verify administrator role assignments, and test SMTP after the update.
+1. Stop the older application and confirm no process or second container can write `data.db` or `designer.db`.
+2. Preserve both databases and `.emu-secret.key`; the key is intentionally excluded from `.emubackup`.
+3. Set `EMU_VERSION=0.5.0.0` and use the current `docker-compose.yml`, which runs both `app` and `updater` services.
+4. Start the stack and allow the idempotent metadata and index migrations to finish.
+5. Review Form Extensions with Lines, large Designer workspaces, paginated reports, and the AI Proposal Inbox.
+6. Verify **System Maintenance** reports WAL mode, foreign keys, lock timeout, checkpoints, and successful integrity checks for both databases.
 
-When upgrading to v0.1.1.0, review the deny-by-default migration before opening production:
+v0.5.0.0 removes the production Windows host, user CLI, MCP package, launchers, installers, and host update/restore scripts. Do not copy those components forward from an older release. Production is Docker-only.
 
-1. Back up `data.db`, `designer.db`, and `.emu-secret.key` separately.
-2. Confirm at least one enabled account holds `FW_SystemAdminRole`.
-3. Review each user's Role and App Access. Existing `FW_FrameworkUser` accounts gain Customize only for business Apps present during the upgrade; Open is not added.
-4. Verify legacy artifacts received a valid Model and that no new App receives a name-based default Model.
-5. Test password change/reset, direct API denial, View/Chart privileges, and any Power BI token scopes.
+The release preserves documented v0.1.x metadata, Function, Script, backup, and synchronous `DataContext` compatibility. Direct access to private SQLite handles such as `kernel.db.prepare()` must be reviewed and migrated to supported framework APIs.
 
-Migrations run once in a transaction and are recorded in the migration ledger. Restarting the upgraded version must not grant additional App Access or repeat legacy Model materialization.
+## Manual Docker fallback
 
-When upgrading through v0.1.2.0–v0.1.4.0:
+If the Web procedure cannot start but the existing app is still healthy:
 
-1. Confirm large App/Model packages import successfully and test forms on iPhone-sized screens.
-2. Export a Full backup with Data, Designer, and Fonts before updating. Preserve `.emu-secret.key` separately.
-3. After v0.1.3.0, verify **App Data Management** access and export one non-production App package. Test web restore only with a recovery copy available.
-4. After v0.1.4.0, review the layered-customization migration audit and diagnostics. Confirm inherited layers are read-only and that Extensions contain only the intended delta.
-5. Test legacy Extension names, stable Form/Menu element targeting, optional Enum/read-only fields, line confirmations, business grids, and mixed Thai/Latin PDFs.
+```sh
+docker compose pull
+docker compose up -d --force-recreate
+docker compose ps
+docker compose logs --tail=200 app updater
+```
 
-The v0.1.4.0 metadata migration is idempotent and does not modify business records. It may normalize field rules, add stable presentation IDs, and rename legacy Extensions to the canonical `<AppPrefix>_<ModelName>_<BaseName>_Extension` form when the name is unambiguous. Keep the pre-update Designer backup until the effective metadata has been reviewed.
-
-## Manual fallback
-
-- Windows: run `Update.cmd`.
-- Docker: set `EMU_VERSION` to the required stable version, then run `docker compose pull app && docker compose up -d app`.
-
-If the app was created manually rather than through Compose, recreate it with `EMU_DEPLOYMENT_MODE=docker`, `EMU_UPDATER_URL=http://updater:3400`, the matching token, the same user-defined network as the updater, and the existing named `/data` volume.
-
-Updates support only forward movement to the latest stable version. Database rollback is never automatic.
+Set `EMU_VERSION` to an explicit stable tag before pulling. Reuse the same named `/data` volume, environment, network, and updater token. Do not run `docker compose down -v`.
 
 ## Related topics
 
-[Backup](backup.md) · [Recovery](recovery.md)
+[Backup](backup.md) · [Docker operations](docker-operations.md) · [Recovery](recovery.md) · [Release notes](../release-notes.md)

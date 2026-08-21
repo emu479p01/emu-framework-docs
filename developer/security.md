@@ -41,6 +41,8 @@ The matrix applies to Forms, table CRUD, Functions, Reports, Views, imports, exp
 
 System metadata is visible only to a System Administrator under **Framework — Read-only**. All Designer create, update, delete, package import/export, and Extension paths reject changes to System Apps and Models.
 
+AI REST tokens are a separate principal. They are limited to selected existing non-system Apps and the `inspect`, `validate`, and `propose` scopes. They inherit no user Role, have no business-record endpoint, and have no apply endpoint. A signed-in customizer must revalidate and approve a proposal for every affected App.
+
 ## Functions and reports
 
 Named server functions and reports are security artifacts, not merely navigation targets. Add each function and report to the appropriate privilege, then assign that privilege through a duty/role. The server must check the function/report privilege before executing it or generating output. A function or report that is absent from a user's privilege set must return an authorization error even when the caller invokes its URL directly.
@@ -67,7 +69,7 @@ Every read and write path evaluates the authenticated session and authorization 
 
 Security and credential tables are blocked from generic Data APIs and import/export even for System Administrators: `FW_User`, `FW_UserRole`, `FW_AppAccess`, `FW_Session`, `FW_WebArtifact`, `FW_Migration`, `FW_ViewToken`, and `FW_ViewTokenScope`. Use dedicated administration endpoints instead. Password hashes, plaintext passwords, and token hashes must not enter metadata responses, record responses, exports, audit data, or client state.
 
-Use secure cookies behind HTTPS, protect first-run setup logs, keep updater tokens and integration secret keys outside source control, and give Docker socket access only to the dedicated updater.
+Use secure cookies behind HTTPS, protect first-run setup logs, keep updater, AI, View, and integration secrets outside source control, and give Docker socket access only to the dedicated updater.
 
 ## Migration and compatibility risks
 
@@ -80,8 +82,8 @@ Use secure cookies behind HTTPS, protect first-run setup logs, keep updater toke
 
 ## Verification checklist
 
-Test at minimum: no role/no App Access, Role only, App only, Customize only, App plus matching Role, and System Administrator. Cover direct API denial for tables, Functions, Reports, and Views; last-admin protection; password change/reset and session revocation; hidden empty menus; and immediate effect of Role/App Access changes.
+Test at minimum: no role/no App Access, Role only, App only, Customize only, App plus matching Role, and System Administrator. Cover direct API denial for tables, Functions, Reports, and Views; last-admin protection; password change/reset and session revocation; hidden empty menus; and immediate effect of Role/App Access changes. For AI tokens, test each scope, App boundary, expiry, revocation, stale proposal, reviewer scope, and the absence of apply/business-data access.
 
 ## Related topics
 
-[User administration](../admin/user-security.md) · [Views and Charts](views-and-charts.md) · [Configuration](../admin/configuration.md) · [Testing](testing.md)
+[User administration](../admin/user-security.md) · [AI REST API](ai-rest-api.md) · [Views and Charts](views-and-charts.md) · [Configuration](../admin/configuration.md) · [Testing](testing.md)
