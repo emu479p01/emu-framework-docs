@@ -2,7 +2,7 @@
 
 ## Purpose
 
-Run immutable EmuFramework images with persistent database storage.
+Run immutable EmuFramework images with persistent database, attachment, and archive storage.
 
 ## Audience
 
@@ -18,13 +18,14 @@ Docker Engine with Compose and access to `ghcr.io`.
 2. Create `.env` beside `docker-compose.yml`:
 
    ```env
-   EMU_VERSION=0.5.0.0
+   EMU_VERSION=1.4.0
    EMU_UPDATER_TOKEN=replace-with-a-random-secret-at-least-24-characters
    PORT=3399
    EMU_SECURE_COOKIES=true
+   EMU_APP_TITLE=EmuFramework
    ```
 
-   The token is created by the operator; it is not downloaded from GitHub. Use the same token for the app and updater, and never commit `.env`.
+   The token is created by the operator; it is not downloaded from GitHub. Use the same token for the app and updater, and never commit `.env`. `EMU_VERSION` is optional because the Compose file defaults to the release it ships with (`1.4.0`), but pinning it makes the installed version explicit. Use a stable `X.Y.Z` tag, never `latest`. `EMU_APP_TITLE` sets the product name shown in the browser title and on the login and setup pages.
 3. Run:
 
    ```sh
@@ -48,16 +49,26 @@ docker compose restart app
 docker compose logs --tail=100 app
 ```
 
-The Compose file supplies the app with `EMU_DEPLOYMENT_MODE=docker`, connects it to the internal updater at `http://updater:3400`, and mounts the named `emu-data` volume at `/data`.
+The Compose file supplies the app with `EMU_DEPLOYMENT_MODE=docker`, connects it to the internal updater at `http://updater:3400`, and mounts three named volumes into both the app and the updater:
+
+| Volume | Mount | Contents |
+|---|---|---|
+| `emu-data` | `/data` | `data.db`, `designer.db`, the secret key, backups, fonts, and update and restore status files |
+| `emu-files` | `/files` | Live attachment files, selected with `EMU_FILE_STORAGE_PATH=/files` |
+| `emu-archive` | `/archive` | The archive catalog and archived payloads, selected with `EMU_ARCHIVE_STORAGE_PATH=/archive` |
+
+If `EMU_FILE_STORAGE_PATH` or `EMU_ARCHIVE_STORAGE_PATH` is not set, the app falls back to `/data/files` and `/data/archive` and the Storage Overview shows a warning that shared fallback storage is in use. Separate volumes keep attachment and archive growth away from the databases and let you place them on larger disks. See [Manage storage and archiving](storage-and-archive.md).
 
 The default integration secret key is `/data/.emu-secret.key`, so it persists in the same named volume. It is not included in `.emubackup` exports; keep a separate secure copy after configuring SMTP. Set `EMU_SECRET_KEY_PATH` only when the replacement path is also mounted persistently.
 
 ### Overriding the volume and network names
 
-Compose already gives the volume and network explicit names, so backup, monitoring, migration, and external service connections can reference them reliably. To use different names — for example to avoid a collision with another deployment on the same host — set these before the first `docker compose up`:
+Compose already gives the volumes and network explicit names (`emuframework-data`, `emuframework-files`, `emuframework-archive`, and `emuframework-network`), so backup, monitoring, migration, and external service connections can reference them reliably. To use different names — for example to avoid a collision with another deployment on the same host — set these before the first `docker compose up`:
 
 ```dotenv
 EMU_VOLUME_NAME=mycompany-emu-data
+EMU_FILES_VOLUME_NAME=mycompany-emu-files
+EMU_ARCHIVE_VOLUME_NAME=mycompany-emu-archive
 EMU_NETWORK_NAME=mycompany-emu-network
 ```
 
@@ -79,19 +90,21 @@ docker pull ghcr.io/emu479p01/emu-framework:<version>
 docker pull ghcr.io/emu479p01/emu-framework-updater:<version>
 ```
 
-To use a specific version instead of the latest, set `EMU_VERSION` accordingly before running `docker compose pull`.
+Pin the version with `EMU_VERSION` before running `docker compose pull`. Run the app and updater images at the same version. The web update replaces only the app container, so after it completes, set `EMU_VERSION` to the new version and run `docker compose pull` and `docker compose up -d` to bring the updater image to the same version.
 
 ## Docker Desktop without cloning
 
 Pulling an image alone is not a complete installation. `docker pull` downloads an image but does not create the app, updater, network, environment variables, or persistent volume.
 
-Create the shared network and volume first:
+Create the shared network and volumes first:
 
 ```powershell
 docker network create emu-network
 docker volume create emu-data
+docker volume create emu-files
+docker volume create emu-archive
 docker network inspect emu-network
-docker volume inspect emu-data
+docker volume inspect emu-data emu-files emu-archive
 ```
 
 If Docker reports that the network or volume already exists, it can be reused, but verify it belongs to this EmuFramework installation before continuing.
@@ -105,6 +118,8 @@ Restart policy: Unless stopped
 Port: 3399 -> 3399
 Network: emu-network
 Volume: emu-data -> /data (Read/Write)
+Volume: emu-files -> /files (Read/Write)
+Volume: emu-archive -> /archive (Read/Write)
 NODE_ENV=production
 EMU_APP_TITLE=EmuFramework
 EMU_DEPLOYMENT_MODE=docker
@@ -113,6 +128,8 @@ EMU_UPDATER_TOKEN=<same token as updater>
 EMU_DB_PATH=/data/data.db
 EMU_DESIGNER_DB_PATH=/data/designer.db
 EMU_SECRET_KEY_PATH=/data/.emu-secret.key
+EMU_FILE_STORAGE_PATH=/files
+EMU_ARCHIVE_STORAGE_PATH=/archive
 ```
 
 After starting a manually created app container, run `docker logs --tail 100 emu-framework`, copy the one-time setup code, and complete **Administrator setup** at `http://localhost:3399`. Restart the container if the code expires.
@@ -126,12 +143,18 @@ Restart policy: Unless stopped
 Network: emu-network
 Network alias: updater
 Volume: emu-data -> /data (Read/Write)
+Volume: emu-files -> /files (Read/Write)
+Volume: emu-archive -> /archive (Read/Write)
 Docker socket: /var/run/docker.sock -> /var/run/docker.sock (Read/Write)
 EMU_UPDATER_TOKEN=<same token as app>
 EMU_APP_CONTAINER=emu-framework
 EMU_IMAGE_REPOSITORY=ghcr.io/emu479p01/emu-framework
 EMU_UPDATE_STATE_PATH=/data/update-status.json
+EMU_FILE_STORAGE_PATH=/files
+EMU_ARCHIVE_STORAGE_PATH=/archive
 ```
+
+The app and the updater must mount the same `/files` and `/archive` volumes. Before it stops the app, the updater compares the two containers' mounts and refuses to update if they differ (see [Update the framework](framework-update.md)).
 
 Do not publish updater port `3400` to the host; it is an internal service. The updater's container name can be anything, but it must carry the network alias `updater`, because the app reaches it at `http://updater:3400`. If the containers were created without a network, connect them afterward:
 
@@ -148,7 +171,13 @@ After changing environment variables, recreate the app container. Restarting an 
 docker exec emu-framework node -e "fetch('http://updater:3400/').then(r=>console.log(r.status)).catch(e=>{console.error(e);process.exit(1)})"
 ```
 
-An HTTP `404` response confirms the network and DNS alias work; the updater has no `GET /` route, but the app reached the service successfully. Check logs for either side if this fails:
+An HTTP `404` response confirms the network and DNS alias work; the updater has no `GET /` route, but the app reached the service successfully. To check the updater's own health endpoint, request `/health` instead; it returns HTTP `200` with `{"ok":true,"busy":false}` when the updater is idle:
+
+```powershell
+docker exec emu-framework node -e "fetch('http://updater:3400/health').then(async r=>console.log(r.status, await r.text())).catch(e=>{console.error(e);process.exit(1)})"
+```
+
+Check logs for either side if this fails:
 
 ```powershell
 docker logs --tail 100 emu-framework
@@ -200,7 +229,7 @@ Inspect the copied files before changing or removing anything:
 docker run --rm --mount type=volume,src=emu-data,dst=/data,readonly alpine:3.20 sh -c "find /data -maxdepth 2 -type f -exec ls -ln {} ';'"
 ```
 
-Expect to find `data.db`, `designer.db`, `backups/`, and `update-status.json`; the exact list depends on features previously used. Recreate both containers with `emu-data` mounted at `/data` — a running container's volume mount cannot be changed in place:
+Expect to find `data.db`, `designer.db`, `backups/`, and `update-status.json`; the exact list depends on features previously used. An installation that already stored attachments before separate volumes were added may also contain `files/` and `archive/` directories. Recreate both containers with `emu-data` mounted at `/data` — a running container's volume mount cannot be changed in place:
 
 ```sh
 docker compose up -d --force-recreate
@@ -219,50 +248,35 @@ Before removing the old volume, verify: the app opens at `http://localhost:3399`
 docker volume rm <SOURCE_VOLUME>
 ```
 
-## Separate database volumes
+## Add file and archive volumes to an existing installation
 
-By default `data.db` and `designer.db` share the single `emu-data` volume mounted at `/data`. To isolate them on separate volumes:
+Installations created before v1.1.0 have only `emu-data`. They keep working after an update, with attachments and the archive stored in `/data/files` and `/data/archive`. To move to separate volumes:
 
-1. Add a second named volume, for example `emu-designer-data`, to `docker-compose.yml` and mount it on the app container alongside the existing one:
-
-   ```text
-   emu-data:/data
-   emu-designer-data:/designer-data
-   ```
-
-2. Set:
-
-   ```env
-   EMU_DB_PATH=/data/data.db
-   EMU_DESIGNER_DB_PATH=/designer-data/designer.db
-   ```
-
-3. Before recreating the container, create a verified backup and inspect the existing mount:
+1. Create a verified Full backup and a separate copy of the secret key.
+2. Stop the stack with `docker compose stop`.
+3. Replace your `docker-compose.yml` with the current one from the framework repository, or add the `emu-files:/files` and `emu-archive:/archive` volumes and the `EMU_FILE_STORAGE_PATH` and `EMU_ARCHIVE_STORAGE_PATH` variables to **both** services.
+4. Create the volumes and copy the existing content, if any, before the stack starts. The example copies into the default Compose volume names:
 
    ```sh
-   docker inspect <app-container> --format '{{json .Mounts}}'
+   docker volume create emuframework-files
+   docker volume create emuframework-archive
+   docker run --rm -v emuframework-data:/from -v emuframework-files:/to alpine sh -c 'if [ -d /from/files ]; then cp -a /from/files/. /to/; fi'
+   docker run --rm -v emuframework-data:/from -v emuframework-archive:/to alpine sh -c 'if [ -d /from/archive ]; then cp -a /from/archive/. /to/; fi'
    ```
 
-4. Create the new volume and copy `designer.db` (and its `-wal`/`-shm` files if present) into it:
+5. Start the stack with `docker compose up -d --force-recreate`.
+6. Open **Settings → System Maintenance → Storage Overview**, confirm the storage paths show `/files` and `/archive`, and confirm the fallback warning is gone. Open an existing attachment to confirm it still downloads.
+7. After you have verified the result and kept a backup, remove the old `files` and `archive` directories from `/data` to reclaim the space.
 
-   ```sh
-   docker volume create emu-designer-data
-   docker run --rm -v emu-data:/from -v emu-designer-data:/to alpine sh -c 'cp -a /from/designer.db* /to/'
-   ```
+## Database location
 
-5. Recreate the app container so it picks up the new environment variables:
+In production the app requires both `EMU_DB_PATH` and `EMU_DESIGNER_DB_PATH` to be under `/data/`, and it refuses to start otherwise. The updater snapshots `data.db` and `designer.db` from the `/data` volume before every update and restore, and backups read the same files. Keep both databases on the `emu-data` volume; placing `designer.db` on a separate volume is not supported. To give the databases more space, grow the disk that holds Docker volumes (see [Database storage](database-storage.md)). Attachments and the archive, which usually grow fastest, already use their own volumes.
 
-   ```sh
-   docker compose up -d --force-recreate app
-   ```
-
-6. Verify `data.db` remains in `emu-data` and `designer.db` now lives in `emu-designer-data`, then confirm the app starts and reads both correctly before removing `designer.db` from the original volume.
-
-Do not run `docker compose down -v` during this process; it deletes named volumes.
+Do not run `docker compose down -v`; it deletes named volumes.
 
 ## Expected result
 
-The app uses the `emu-data` volume. The updater has no public port.
+The app uses the `emu-data`, `emu-files`, and `emu-archive` volumes, and the updater mounts the same three. The updater has no public port, and both containers report `healthy` in `docker compose ps`.
 
 ## Common errors
 
@@ -271,8 +285,9 @@ The app uses the `emu-data` volume. The updater has no public port.
 - `EMU_UPDATER_URL` is normally `http://updater:3400`; it is a Docker service name, not a public URL and not `localhost`.
 - `Deployment: unsupported` means the **app** container did not receive `EMU_DEPLOYMENT_MODE=docker`; setting the variable only on the updater is insufficient.
 - If the app cannot resolve `updater`, the two containers are not on the same user-defined network.
+- A warning in **Storage Overview** that shared fallback storage is in use means `EMU_FILE_STORAGE_PATH` or `EMU_ARCHIVE_STORAGE_PATH` is not set or the volume is not mounted. See [Manage storage and archiving](storage-and-archive.md).
 - If port `3399` is already allocated, stop the old app container or choose another host port, for example `3401:3399`.
 
 ## Related topics
 
-[Docker operations](docker-operations.md) · [Framework update](framework-update.md)
+[Configuration](configuration.md) · [Storage and archive](storage-and-archive.md) · [Docker operations](docker-operations.md) · [Framework update](framework-update.md)

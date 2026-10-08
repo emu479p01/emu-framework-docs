@@ -1,6 +1,139 @@
 # Release notes
 
-These notes describe the changes since v0.1.0.0 that affect users, administrators, and application developers.
+These notes describe the changes since v0.1.0.0 that affect users, administrators, and application developers. The current version is 1.4.0. The same notes are published with each [GitHub release](https://github.com/emu479p01/emu-framework/releases).
+
+## About version numbers
+
+Starting with v1.0.0, releases use three components, `Major.Minor.Patch`, and each release has a type:
+
+- **FU (Framework Update)** adds functionality or makes structural changes. A breaking structural change increments `Major`; important backward-compatible functionality increments `Minor`.
+- **PU (Proactive Update)** contains bug fixes, hotfixes, and security fixes, and increments `Patch`.
+
+The framework updater accepts only stable `X.Y.Z` targets. Legacy four-component versions, such as v0.5.0.0 below, remain immutable history. The Compose file defaults to the current release tag instead of `latest`.
+
+## v1.4.0
+
+**FU - Framework Update.** Released 2026-09-28.
+
+### Draft-based record creation
+
+- Opening **New** on a form no longer inserts a row. The form shows default values and values set by `initValue`, including read-only document numbers, before you save. Saving is atomic and retry-safe, and a draft survives a server restart.
+- Drafts are encrypted, belong to the user who opened them, and expire after 24 hours. An expired draft, another user's draft, or a draft created before a metadata change is rejected with `409`; reopen **New** to continue. The values you typed stay in the open page but are not transferred automatically.
+- Every table exposes read-only audit aliases `sys_createdBy`, `sys_createdAt`, `sys_modifiedBy`, and `sys_modifiedAt` for lists, filters, sorting, and Views.
+
+### Display and branding
+
+- Datetimes are stored and returned in UTC and shown in the browser time zone. Datetime input without an offset is interpreted as UTC. Numbers display with grouping; IDs, references, and strings are not reformatted.
+- `EMU_APP_TITLE` sets the product name in the browser title and on the login and setup pages.
+- Deployment import previews start collapsed with add, change, remove, and high-risk counts, and show where moved or deleted artifacts came from.
+
+### Functions with image input
+
+- A Function can declare `imageInput` to receive JPEG, PNG, or WebP images attached to a record, chosen from files or taken with the camera. Uploads are signature-checked, permission-checked, and retried per file. WebP attachments can be previewed.
+
+### Breaking change
+
+Lifecycle hooks (`initValue`, `validateWrite`, `validateDelete`) and data event handlers must be synchronous. An `async` function or a returned Promise now raises `async lifecycle handlers are not supported`. Move awaited work into an async Function. System field names are reserved case-insensitively, and schema sync stops without changes if an existing column collides with an audit alias.
+
+Before upgrading, review Scripts for async lifecycle handlers, create a Full backup, and preserve `.emu-secret.key`. Update the app and updater images together to `1.4.0`. Draft storage (`FW_RecordDraft`) is created automatically and no data migration is required. See [Troubleshoot the system](admin/troubleshooting.md) for the new failure messages.
+
+## v1.3.0
+
+**FU - Framework Update.** Released 2026-09-22.
+
+### App-local navigation and Apps & Models
+
+- Recent navigation is app-local: each App (and Settings) keeps its own list of up to ten entries per user, following the original menu structure and including record detail routes. Existing Favorites data is preserved.
+- **Settings → Apps & Models** lists Apps and Models with layer, source, metadata revision, dependencies, deployment history, and license state. See [Manage Apps, Models, deployments, and licenses](admin/apps-models-licenses.md).
+
+### Selected-model deployment and licenses
+
+- The Designer builds deployment packages for selected Models: **Vendor update** (SYS, ISV, LOC layers) or **UAT → Prod** (all layers). Import preview shows additions, changes, removals, and preserved Models; ownership conflicts, missing dependencies, and incompatible customizations block deployment. Unselected Models and business data are kept.
+- Applying a change set revalidates the candidate and restores runtime registrations and database changes when a synchronous apply or persistence step fails.
+- Optional offline ISV licenses use Ed25519 files bound to a customer ID and installation ID, issued with the seller CLI. When a required license is missing, invalid, or expired, the owning App and its dependent Apps become read-only; a valid renewal takes effect without redeployment.
+
+Before upgrading, back up the data and designer databases together and update the app and updater images together to `1.3.0`. License tables are created automatically in `designer.db`, and existing Models remain unlicensed. Selected-model packages use schema version 2 and require 1.3.0 at the destination; version-1 packages remain importable. Each environment keeps its own installation identity, so promote metadata with packages and never clone a designer database.
+
+## v1.2.0
+
+**FU - Framework Update.** Released 2026-09-19.
+
+### Navigation and language
+
+- **Recent** replaces Favorites in the UI. It always shows the ten most recently opened authorized menu items, with the newest first. The star buttons and the Favorites root are gone; the Favorites API and stored data remain.
+- Framework screens ship in English and Thai. Choose the language from the user menu; routes, open records, and unsaved form state are kept.
+- Apps can declare a **Default language**. Label translation falls back from the user's exact locale to its base language, the App's default language, and then the stored label.
+
+### Designer and attachments
+
+- The Designer adds a Translation editor and structured Data Entity and Data Entity Extension editors.
+- Image attachments (PNG and JPEG) show thumbnails and open in a responsive viewer on desktop and mobile.
+- System Maintenance separates **Storage Overview** from **Archive Policy**, with labeled usage rows, per-mount capacity, storage paths, and a confirmation before every manual archive run.
+
+Before upgrading, create a Full backup and update the app and updater images together to `1.2.0`. No schema migration is required. After the restart, set each App's Default language in the Designer if it is not English.
+
+## v1.1.0
+
+**FU - Framework Update.** Released 2026-09-19.
+
+### Attachments and storage
+
+- Saved header and line records accept file, note, and URL attachments with SHA-256 integrity, streaming upload and download, and the permissions of the parent record. Limits are set with `EMU_ATTACHMENT_MAX_BYTES` and `EMU_ATTACHMENT_ALLOWED_TYPES`.
+- Docker deployments gain the `emu-files:/files` and `emu-archive:/archive` volumes with `EMU_FILE_STORAGE_PATH` and `EMU_ARCHIVE_STORAGE_PATH`. Existing installations keep working with `/data/files` and `/data/archive`, and the administration page shows a warning.
+- A Storage & Archive dashboard reports filesystem capacity and usage for databases, WAL files, backups, fonts, live files, the archive, and each App.
+- Backup schema version 4 adds the **Live attachments** and **Archive catalog and payloads** components, and backups stream to the browser.
+
+### Data Entities, archiving, and reports
+
+- Header/Line Data Entities import and export documents as XLSX or a CSV ZIP package. Each document commits atomically and failed rows can be downloaded.
+- Archive policies for archive-eligible Data Entities move old documents out of the live tables into immutable, checksummed payloads. Archived documents can be searched read-only and restored.
+- The Report Designer adds A3, A4, A5, Letter, Legal, and custom paper sizes, orientation, four margins, display units, borders, and PNG/JPEG images from bundled assets or record attachments.
+- Metadata labels can be translated per locale, and each user can choose a locale.
+
+Before upgrading, create a Full backup and preserve `.emu-secret.key`. Add the two new volumes and environment variables, then update the app and updater images together to `1.1.0`. Before it stops the app, the updater verifies that both containers see the same file and archive mounts. Plan capacity for databases, backups, attachments, and the archive; see [Manage storage and archiving](admin/storage-and-archive.md). Archive data is kept indefinitely because automatic purge is not provided.
+
+## v1.0.2
+
+**PU - Proactive Update.** Released 2026-09-19.
+
+### Durable updates and restores
+
+- Updates and restores run through a phase-based maintenance journal. Status records add the optional `phase`, `rollbackStatus`, and `recoveryRequired` fields; the existing `status` field is unchanged.
+- When health verification fails, the updater restores the previous container and the pre-operation data snapshot. Interrupted phases are compensated idempotently, and recovery artifacts are kept when automated rollback cannot finish.
+- Both SQLite databases are checkpointed and closed on graceful shutdown.
+- Update targets must be stable `X.Y.Z` versions. A local-image mode for unpublished test images fails closed.
+- Unauthorized form and line actions are omitted from `/api/metadata`; direct action calls still return `403`.
+- Report Designer canvas width honors asymmetric left and right margins.
+
+Before upgrading, back up both databases, preserve `.emu-secret.key`, and update the app and updater images together to `1.0.2`. No migration is required. See [Update the framework](admin/framework-update.md) and [Recover from a failed update](admin/recovery.md).
+
+## v1.0.1
+
+**PU - Proactive Update.** Released 2026-09-03.
+
+### Safer updates
+
+- The updater exposes a health endpoint and a container health check.
+- An image that is not published is rejected before the running app container is changed.
+- If an update fails after the restart begins, the previous container is restored, and background update failures are recorded reliably.
+- The updater detects interrupted update and restore jobs on restart, recovers the app container where possible, and marks the job failed with an actionable message.
+
+### AI Proposal Inbox
+
+- Adds status filters, refresh, expand and collapse controls, and responsive cards. Reviewed proposals can be removed from the Inbox without removing applied metadata or audit records.
+
+Before upgrading, back up both databases, preserve `.emu-secret.key`, and update both images to `1.0.1`. No migration is required.
+
+## v1.0.0
+
+**FU - Framework Update.** Released 2026-09-03.
+
+### First release under the new version model
+
+- Establishes EmuFramework 1.0.0 as the baseline for the metadata-driven platform described in these docs: Web Designer, generated business UI on SQLite, layered customization, role-based security, REST integrations, reviewed AI proposals, and Docker deployment with backup, restore, and health diagnostics.
+- This is the first release under the three-component `Major.Minor.Patch` version model. The legacy four-component tags up to `0.5.0.0` stay immutable and are not extended.
+
+Before upgrading an existing installation, back up both SQLite databases and preserve `.emu-secret.key`. Migrations are idempotent.
 
 ## v0.5.0.0
 

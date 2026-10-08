@@ -28,7 +28,7 @@ Artifact lists are paginated and filterable by App, Model, and kind. In a large 
 
 Work through objects in this order so each step can reference the ones before it: **App → Model → Object → Menu → Privilege/Duty/Role**.
 
-The Designer supports these object kinds, including Extensions of the kinds that support extension: App, Table, Enum, Form, Menu, Function, Script, Report, View, Chart, Privilege, Duty, and Role.
+The Designer supports these object kinds, including Extensions of the kinds that support extension: App, Table, Enum, Form, Menu, Function, Script, Report, View, Chart, Privilege, Duty, Role, Translation, and Data Entity. Translation, Data Entity, and Data Entity Extension are created from the **New** menu like other artifacts.
 
 `canCustomize` grants Designer capability for the selected App only. It does not grant `canOpen` or business-data permissions. System Administrators can inspect Framework metadata under **Framework — Read-only**, but nobody can change, delete, package, or extend it.
 
@@ -99,6 +99,8 @@ When the source field changes, any dropdown that depends on it reloads its optio
 }
 ```
 
+When a user opens **New**, the form is a draft: default values and the results of `initValue` hooks, including read-only document numbers, are shown before the record is saved, and nothing is inserted until the user saves. In v1.4.0 the metadata validator still rejects a field that is both read-only and mandatory, so keep read-only fields optional and let `initValue` supply them. Hooks (`initValue`, `validateWrite`, `validateDelete`) and data event handlers must be synchronous; move awaited or external work into an async Function. A draft is rejected with `409` if table, Script, or Function metadata changes while it is open, so users reopen **New** after you apply a change. See [Record lifecycle](../developer/record-lifecycle.md).
+
 A Function that runs before create does not receive `recordId`, but it still receives the current `record` values — write it to handle the missing-ID case. See [Develop Functions and actions](../developer/functions.md).
 
 ## Function execution mode
@@ -108,6 +110,51 @@ Choose **Transactional — synchronous and atomic** for normal database operatio
 Choose **Async integration — supports await, HTTP and email** when the Function calls `services.http.request(...)` or `services.email.send(...)`. Async mode does not keep one database transaction open while waiting for the network. Put database changes in short explicit `ctx.tts()` blocks, and never await an external request inside a transaction.
 
 The Function body receives `ctx`, `args`, `kernel`, and `services`. Async Functions must handle rejected requests and non-success HTTP status codes explicitly.
+
+## Function image input
+
+Select **Image input** on a Function when it should receive photos or image files for an existing record. Then choose the **Attachment table** (a business table, not a `FW_*` table), the **Record ID argument** that carries the record ID, and whether to **Allow multiple images**. When a user runs the Function, its dialog offers **Choose images** and **Take a photo** (JPEG, PNG, or WebP); the images are uploaded as attachments of the record and the Function receives their `attachmentIds`. The Function's code is never sent to the browser. See [Work with attachments](attachments.md) for what users see and [Attachments and Function image input](../developer/attachments.md) for the code contract.
+
+## Translations and the default language
+
+Use a Translation artifact to translate labels for one locale.
+
+1. Choose **New → Translation** with the App and Model selected.
+2. Set the **Locale**, for example `th` or `th-TH`.
+3. In the editor, each row is a translatable target: its **Resource key**, **Default text**, and your **Translation**. Search the list, use **Show untranslated only**, or filter by category. **Copy default texts** pre-fills the empty rows so you can edit them.
+4. Leave a translation cell empty when you do not want to override the label. A partial translation only changes the keys it contains.
+5. Save. Users who selected that locale see the new labels.
+
+Targets that no longer exist in the metadata are listed as **Saved keys without a current metadata target**. Resource keys beginning with `ui.` belong to the framework and are read-only. If the same key is translated in several Layers, the higher Layer wins.
+
+Each App has a **Default language**, set by editing the App (default `en`). A user sees labels in this order: the user's exact locale, its base language (`th` for `th-TH`), the App's default language, and then the label stored in the metadata. The Designer warns when no translation exists yet for the default language you chose. Business data values, script code, technical names, and raw server errors are never translated. See [Localize labels with Translations](../developer/localization.md).
+
+## Data Entities and Data Entity Extensions
+
+A Data Entity describes a business document (a header and its lines) that users can import and export, and that administrators can archive.
+
+In the **Data Entity** editor, set:
+
+- **Root table** and **Business key**: the fields that identify one document.
+- **Fields** exported from the root table.
+- **Lines**: use **+ Add line** for each line table and its parent reference.
+- **Archive eligible** and **Business date field** if the document can be archived. A business date field is required when archiving is allowed.
+
+A **Data Entity Extension** adds to an existing Data Entity. Choose the **Data Entity**, then use **Additional root fields** and **Additional fields on existing lines**, or add new lines. An extension cannot change the root table, the business key, the line relationships, or the archive settings. Import, export, archive, and restore all read the merged entity. The editor checks the structure on the client, and the server validation has the final say when you save. See [Exchange documents with Data Entities](../developer/data-entities.md) and [Manage storage and archiving](../admin/storage-and-archive.md).
+
+## Models, ISV license vendor, and deployment packages
+
+When you create or edit a Model on the ISV Layer, the Model dialog shows an optional **License vendor ID**. Leave it blank for an unlicensed Model. Entering a vendor ID makes the Model require an offline license from that vendor; an administrator then registers the vendor and imports the license (see [Manage Apps, Models, deployments, and licenses](../admin/apps-models-licenses.md)). Once a license requirement is installed, ordinary edits cannot remove or change it.
+
+To move whole Models to another environment:
+
+1. Open the App's menu and choose **Build deployment package**.
+2. Choose **Vendor update — SYS / LOC / ISV** or **UAT → Prod — all layers**, then select complete Models.
+3. Choose **Download package**.
+4. At the destination, import the package. **Review Metadata Import** shows a preview that starts collapsed: per Model it lists create, update, and delete counts and the number of high-risk items. Expand a Model, or use **Expand all**, to see each artifact and where moved or deleted artifacts came from.
+5. Confirm only after you have reviewed the high-risk items. Missing dependencies, ownership conflicts, and incompatible customizations block the import.
+
+Selected Models replace their metadata at the destination; other Models and all business data are kept. File-based Apps and the framework's `system` App cannot be packaged. See [Deploy Models and issue ISV licenses](../developer/model-deployment.md) for the package format.
 
 ## Report Designer on small screens
 
@@ -150,4 +197,4 @@ Metadata is stored in `designer.db`; additive schema changes are applied to the 
 
 ## Related topics
 
-[Metadata](../developer/metadata.md) · [Views and Charts](../developer/views-and-charts.md) · [Security](../developer/security.md) · [Extensions](../developer/extensions.md) · [Functions and actions](../developer/functions.md) · [Customization checklist](../developer/customization-checklist.md) · [Backup](../admin/backup.md)
+[Metadata](../developer/metadata.md) · [Views and Charts](../developer/views-and-charts.md) · [Security](../developer/security.md) · [Extensions](../developer/extensions.md) · [Functions and actions](../developer/functions.md) · [Customization checklist](../developer/customization-checklist.md) · [Record lifecycle](../developer/record-lifecycle.md) · [Localization](../developer/localization.md) · [Data Entities](../developer/data-entities.md) · [Model deployment](../developer/model-deployment.md) · [Work with attachments](attachments.md) · [Backup](../admin/backup.md)

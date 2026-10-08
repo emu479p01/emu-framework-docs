@@ -30,6 +30,8 @@ Validation rejects a package for another App, incompatible framework data, check
 
 Select **Delete all data**, review the affected tables, type the App name exactly, and confirm. This permanently removes App-owned business rows but does not delete the App, Models, metadata, or tables. Export a recovery package first.
 
+The packages contain App-owned table rows only. Attachment files, attachment records, and archived documents are not part of an `.emuappdata` package; they are covered by the Data, Files, and Archive components of a Full backup. Replacing data is refused while the App is read-only because of an ISV license (see [Manage Apps, Models, deployments, and licenses](apps-models-licenses.md)).
+
 Every export, replace, and delete is recorded in the App-data audit log. Do not use App Data Management as a substitute for a Full backup: users, security, Designer metadata, fonts, and integration configuration belong to other backup components.
 
 ## Related topics

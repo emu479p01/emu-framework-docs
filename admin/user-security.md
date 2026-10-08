@@ -45,6 +45,16 @@ Passwords and hashes are never returned in user, metadata, export, or audit resp
 
 Disabling a user revokes their sessions. Deleting removes the user and their Role/App Access assignments. The server rejects any disable, delete, or Role removal that would leave no enabled account with `FW_SystemAdminRole`.
 
+## Language preference
+
+Each user chooses a display language from the user menu. The choice is stored with the account and applies to framework screens and to translated App labels. Administrators do not need to set it. See [Use the Web Designer](../user/web-designer.md) for how Apps declare a default language.
+
+## Attachment and administration permissions
+
+Attachments follow the permissions of the record they belong to. A user needs read permission on the record's table to list, download, or preview its attachments, and update permission to add or delete them. A Function that accepts image input also needs the Function privilege and update permission on the target record. See [Work with attachments](../user/attachments.md).
+
+Storage Overview, Archive Policy, archived document search and restore, **Apps & Models**, and ISV license administration are available only to accounts with `FW_SystemAdminRole`.
+
 ## Dedicated APIs
 
 ```text
