@@ -4,7 +4,9 @@
 
 Documentation for [EmuFramework](https://github.com/emu479p01/emu-framework), maintained in the dedicated [emu-framework-docs repository](https://github.com/emu479p01/emu-framework-docs). Choose a learning path by role, then use the focused concept, how-to, and reference pages.
 
-Current framework version: **0.5.0.0**
+Current framework version: **1.4.0**
+
+Releases use `Major.Minor.Patch`. **FU** (Framework Update) releases add functionality or structural changes; **PU** (Proactive Update) releases contain fixes. Legacy four-component versions such as `0.5.0.0` remain as history.
 
 - [Release notes](release-notes.md)
 
@@ -12,6 +14,7 @@ Current framework version: **0.5.0.0**
 
 - [Sign in and navigate](user/getting-started.md)
 - [Use the Web Designer](user/web-designer.md)
+- [Work with attachments](user/attachments.md)
 
 ## Administrator
 
@@ -20,6 +23,8 @@ Current framework version: **0.5.0.0**
 - [Manage users and application access](admin/user-security.md)
 - [Manage application data](admin/app-data-management.md)
 - [Connect Power BI to the View API](admin/power-bi-view-api.md)
+- [Manage storage and archiving](admin/storage-and-archive.md)
+- [Manage Apps, Models, deployments, and licenses](admin/apps-models-licenses.md)
 - [Update the framework](admin/framework-update.md)
 - [Back up databases](admin/backup.md)
 - [Restore databases](admin/restore.md)
@@ -53,6 +58,11 @@ Current framework version: **0.5.0.0**
 - [Understand security](developer/security.md)
 - [Build Views and embedded Charts](developer/views-and-charts.md)
 - [Design paginated Reports](developer/reports.md)
+- [Localize labels with Translations](developer/localization.md)
+- [Exchange documents with Data Entities](developer/data-entities.md)
+- [Work with attachments and Function image input](developer/attachments.md)
+- [Understand the record lifecycle](developer/record-lifecycle.md)
+- [Deploy Models and issue ISV licenses](developer/model-deployment.md)
 - [Customization checklist](developer/customization-checklist.md)
 
 ### Tools, testing, and operations
