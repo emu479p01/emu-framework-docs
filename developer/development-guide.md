@@ -1,6 +1,6 @@
 # Developer documentation overview
 
-This page is the entry point for developing applications and extensions with EmuFramework. It preserves the original development-guide URL while directing readers to focused Microsoft Docs–style pages.
+This page is the entry point for developing applications and extensions with EmuFramework v1.4.0. It preserves the original development-guide URL while directing readers to focused Microsoft Docs–style pages.
 
 ## Learning path
 
@@ -38,11 +38,16 @@ flowchart LR
 - [Design paginated Reports](reports.md)
 - [Create extensions](extensions.md)
 - [Use hooks and data events](hooks-events.md)
+- [Understand the record lifecycle](record-lifecycle.md)
+- [Localize metadata with Translations](localization.md)
+- [Define Data Entities](data-entities.md)
+- [Work with record attachments](attachments.md)
+- [Deploy models and license ISV add-ons](model-deployment.md)
 
 ## How-to guides
 
 - [Develop Scripts](scripts.md)
-- [Develop Functions and actions](functions.md)
+- [Develop Functions and actions](functions.md) (including image input)
 - [Add business logic](business-logic.md)
 - [Use the Web Designer](../user/web-designer.md)
 

@@ -28,10 +28,12 @@ Base artifacts with the same logical identity follow `SYS < ISV < LOC < DEV < CU
 ```text
 tableExtension, enumExtension, formExtension, menuExtension,
 privilegeExtension, dutyExtension, roleExtension, scriptExtension,
-viewExtension, chartExtension, functionExtension
+viewExtension, chartExtension, functionExtension, dataEntityExtension
 ```
 
-The target property matches the kind: `table`, `enum`, `form`, `menu`, `privilege`, `duty`, `role`, `script`, `view`, `chart`, or `function`.
+The target property matches the kind: `table`, `enum`, `form`, `menu`, `privilege`, `duty`, `role`, `script`, `view`, `chart`, `function`, or `dataEntity`.
+
+There is no extension kind for Reports or Translations in v1.4.0. Replace a Report with a higher-Layer `report` of the same name. Add or correct wording with another `translation`; for one key and locale the higher Layer wins (see [Localize metadata with Translations](localization.md)).
 
 ## Delta and presentation overrides
 
@@ -39,7 +41,7 @@ An Extension stores only the current Layer delta. Inherited metadata remains rea
 
 | Extension | Override collection | Supported changes |
 | --- | --- | --- |
-| `tableExtension` | `fieldOverrides` | field label and create/update editability |
+| `tableExtension` | `fieldOverrides` | field label, create/update editability, `readOnly`, `multiline`, and `encrypted` |
 | `enumExtension` | `valueOverrides` | enum-value label |
 | `formExtension` | `elementOverrides` | group/action/Chart/line label, visibility, and order by stable `targetId` |
 | `menuExtension` | `itemOverrides` | menu label, icon, visibility, and order by stable `targetId` |
@@ -49,6 +51,8 @@ An Extension stores only the current Layer delta. Inherited metadata remains rea
 Form groups, actions, Charts, lines, and menu items should have stable `id` values. Target those IDs rather than array positions so a lower-layer insertion or reordering does not redirect a customization.
 
 Form Line editing also uses `lineOverrides`. It can override inherited fields, aggregates, actions, label, visibility, and order, or add a new Line grid while saving only the current Layer delta.
+
+`dataEntityExtension` is purely additive. It appends root fields, new lines, or extra fields on an existing line of a Data Entity, and it can never change the root table, business key, line relationships, or archive settings. Import, export, archive, and restore read the merged entity. Add the underlying Table fields through a `table` or `tableExtension` first. See [Define Data Entities](data-entities.md#extend-a-data-entity).
 
 `functionExtension` supplies Chain-of-Command code. Call `next(args)` to continue the inherited implementation; review it as executable code and test both the extended and base paths.
 
@@ -113,4 +117,4 @@ Validate schema and cross-references, test generated forms/lists/menus, verify a
 
 ## Related topics
 
-[Application workflow](application-workflow.md) · [Metadata](metadata.md) · [Scripts](scripts.md) · [AI REST API](ai-rest-api.md) · [Security](security.md) · [Customization checklist](customization-checklist.md)
+[Application workflow](application-workflow.md) · [Data Entities](data-entities.md) · [Metadata](metadata.md) · [Scripts](scripts.md) · [AI REST API](ai-rest-api.md) · [Security](security.md) · [Customization checklist](customization-checklist.md)

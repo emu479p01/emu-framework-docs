@@ -1,6 +1,6 @@
 # Understand security
 
-EmuFramework v0.1.1.0 is deny-by-default. A normal user must pass two independent gates: **App Access** for the owning App and **Role → Duty → Privilege** for the requested object and operation. A role may also reference privileges directly.
+EmuFramework is deny-by-default (this model has applied since v0.1.1.0 and is unchanged in v1.4.0). A normal user must pass two independent gates: **App Access** for the owning App and **Role → Duty → Privilege** for the requested object and operation. A role may also reference privileges directly.
 
 ## Audience
 
@@ -51,7 +51,7 @@ Named server functions and reports are security artifacts, not merely navigation
 
 The metadata response is filtered for the authenticated user. A menu item is visible only when its form, function, or report target is accessible. Empty sub-menus are removed, and an app with no visible menu items is omitted. This filtering improves usability but is not a security boundary: direct page navigation and API requests must still be authorized server-side.
 
-Buttons for operations the current user cannot perform should remain visible as disabled/dim where the UI needs to communicate the unavailable operation. The disabled state is only a client-side affordance; the API must enforce the same permission independently.
+Since v1.0.2, form and line actions that the user is not authorized to run are omitted from `GET /api/metadata` rather than shown disabled, and the client also filters hidden or disabled actions defensively. An action is omitted when its Function, Report, or Picker source table is not granted, or when its named Privilege is not held. Direct calls to an omitted action still return `403`, because omission is only a usability measure and the API enforces the same permission independently.
 
 ## Framework users and administrators
 
@@ -62,6 +62,21 @@ Buttons for operations the current user cannot perform should remain visible as 
 Only System Administrators can create, edit, disable, delete, assign, or reset other users through **Settings → Users & Security**. The server protects the last enabled System Administrator. See [Manage users and application access](../admin/user-security.md).
 
 On first start, setup is the only unauthenticated administrative flow. `GET /api/setup/status` returns `required`, `expiresAt`, `legacyReset`, and the fixed `username` when a legacy reset is required. `POST /api/setup/complete` accepts `code`, `username`, `displayName`, and `password`; it creates or repairs the first administrator, assigns `FW_SystemAdminRole`, and signs in that user. The code expires after 15 minutes or ten failures. Do not expose server logs containing the code to untrusted users.
+
+## Encrypted fields and secrets
+
+A string field marked `encrypted` is stored with AES-256-GCM, using the installation's secret key (`.emu-secret.key`, or the path in `EMU_SECRET_KEY_PATH`). Generic data APIs return the mask `••••••••` instead of the value, and an update that sends the mask or an empty value leaves the stored secret unchanged. Encrypted fields cannot be filtered, searched, sorted, exported, used as an import key, shown in a Report, or used in a View, and they cannot be a title field, index, lookup display field, or `copyFields` source. Record drafts are stored encrypted with the same key. Trusted server code (hooks, Scripts, Functions) reads the decrypted value through `DataContext`, so review that code as you would any secret-handling code, and back up the key file separately from the databases. Without it the values cannot be recovered.
+
+## Record, attachment, and exchange permissions
+
+- **Drafts:** creating a draft and saving it both require `create` permission on the Table, and a draft token works only for the user and Table that created it. See [Record lifecycle](record-lifecycle.md).
+- **Attachments:** permissions are inherited from the parent record. `read` allows list, download, and preview; `update` allows upload, notes, links, and delete. Function image uploads additionally require permission to run the Function and ownership of the upload. See [Attachments](attachments.md).
+- **Data Entities:** export needs `read` on the root and every line Table; import needs `create` and `update` on all of them. Archive and restore are System Administrator operations. See [Define Data Entities](data-entities.md).
+- **Metadata packages and licensing:** deployment needs Customize permission for the App, and license, vendor-key, and Apps & Models administration is limited to System Administrators. See [Deploy models and license ISV add-ons](model-deployment.md).
+
+## ISV license guard
+
+When an `ISV` Model declares a `license` and the installed offline license is missing, invalid, not yet valid, or expired, the owning App and every App that depends on it become read-only. The server returns `403` with code `APP_LICENSE_READ_ONLY` for business writes, actions and Functions, Data Entity import, archive processing, and attachment changes. Hooks, events, and actions registered by a Script carry their owning App's guard even when another App's request invokes them, and the guard is checked again before a transaction commits. Reading, ordinary exports, backups, and license administration remain available. Offline licensing cannot stop an operator who controls the server, source, database, or clock; see the limits in [Deploy models and license ISV add-ons](model-deployment.md).
 
 ## Server-side boundary
 
@@ -82,8 +97,8 @@ Use secure cookies behind HTTPS, protect first-run setup logs, keep updater, AI,
 
 ## Verification checklist
 
-Test at minimum: no role/no App Access, Role only, App only, Customize only, App plus matching Role, and System Administrator. Cover direct API denial for tables, Functions, Reports, and Views; last-admin protection; password change/reset and session revocation; hidden empty menus; and immediate effect of Role/App Access changes. For AI tokens, test each scope, App boundary, expiry, revocation, stale proposal, reviewer scope, and the absence of apply/business-data access.
+Test at minimum: no role/no App Access, Role only, App only, Customize only, App plus matching Role, and System Administrator. Cover direct API denial for tables, Functions, Reports, and Views, omission of unauthorized actions from `/api/metadata`, attachment access through a parent record the user cannot read, and a read-only licensed App; last-admin protection; password change/reset and session revocation; hidden empty menus; and immediate effect of Role/App Access changes. For AI tokens, test each scope, App boundary, expiry, revocation, stale proposal, reviewer scope, and the absence of apply/business-data access.
 
 ## Related topics
 
-[User administration](../admin/user-security.md) · [AI REST API](ai-rest-api.md) · [Views and Charts](views-and-charts.md) · [Configuration](../admin/configuration.md) · [Testing](testing.md)
+[User administration](../admin/user-security.md) · [AI REST API](ai-rest-api.md) · [Attachments](attachments.md) · [Model deployment](model-deployment.md) · [Views and Charts](views-and-charts.md) · [Configuration](../admin/configuration.md) · [Testing](testing.md)

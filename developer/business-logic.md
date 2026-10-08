@@ -23,6 +23,8 @@ An application with its tables, permissions, and metadata workflow defined.
 | Bounded HTTP or email integration | Async [Function/action](functions.md) |
 | Other native or reusable integration | Reviewed TypeScript |
 
+Hooks and data events run inside the write transaction and must be synchronous; an `async` handler raises `async lifecycle handlers are not supported`. Anything that awaits belongs in an async Function. `initValue` runs when a user opens a new record as a draft, before any row exists; see [Record lifecycle](record-lifecycle.md).
+
 Execute related writes inside a transaction through `DataContext`. A transactional Function is synchronous and atomic. An async Function may await the built-in HTTP and email services, but it must use short explicit `ctx.tts()` blocks for database writes. Keep validation deterministic, never await network calls inside database transactions, and enforce authorization on the server even when the client hides an action.
 
 ## Testing
@@ -31,4 +33,4 @@ Test success, rejection, rollback, unauthorized access, and concurrent behavior.
 
 ## Related topics
 
-[Architecture](architecture.md) · [Testing](testing.md)
+[Architecture](architecture.md) · [Record lifecycle](record-lifecycle.md) · [Testing](testing.md)

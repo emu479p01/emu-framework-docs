@@ -27,6 +27,7 @@ flowchart TD
     F --> G[Duties]
     G --> H[Roles]
     H --> I[Users and app access]
+    C --> T[Translations and Data Entities]
     C --> J[Hooks, Scripts, and Functions]
     J --> F
 ```
@@ -41,15 +42,16 @@ Create the App first; it starts with zero Models. Add and select a Model before 
 4. Define Views and Charts when the App needs reusable queries or visualizations.
 5. Define Forms, list fields, embedded Charts, menus, and Reports.
 6. Add Privileges (including Views), Duties, Roles, and App Access.
-7. Choose the smallest business-logic mechanism for each rule.
-8. Validate metadata, App/Model scope, and cross-references.
-9. Test generated lists, Forms, Charts, actions, permissions, and database effects.
-10. Export an App or Model package and commit it when the metadata needs source review or promotion.
+7. Optionally add [Translations](localization.md) and set the App `defaultLocale`, and add [Data Entities](data-entities.md) for documents that users exchange as spreadsheets.
+8. Choose the smallest business-logic mechanism for each rule. Keep hooks and events synchronous and put awaited work in async Functions; see [Record lifecycle](record-lifecycle.md).
+9. Validate metadata, App/Model scope, and cross-references.
+10. Test generated lists, Forms, new-record drafts, Charts, actions, permissions, and database effects.
+11. Export an App or Model package, or a [selected-model deployment package](model-deployment.md), and commit it when the metadata needs source review or promotion.
 
 ## Review and promotion
 
-Use Web Designer for human authoring and reviewed AI REST proposals for automated assistance inside an existing App. Export App or Model packages when definitions require code review, repeatable promotion, and version control. Every path obeys the same metadata schema, security policy, and Extension boundaries.
+Use Web Designer for human authoring and reviewed AI REST proposals for automated assistance inside an existing App. Export App or Model packages when definitions require code review and version control. Use selected-model packages, in `vendor` or `promotion` mode, to move several Models between installations; business data, users, and licenses are not part of a package. Every path obeys the same metadata schema, security policy, and Extension boundaries.
 
 ## Related topics
 
-[Metadata](metadata.md) · [Views and Charts](views-and-charts.md) · [Security](security.md) · [Extensions](extensions.md) · [Functions and actions](functions.md) · [Testing](testing.md)
+[Metadata](metadata.md) · [Views and Charts](views-and-charts.md) · [Security](security.md) · [Extensions](extensions.md) · [Functions and actions](functions.md) · [Localization](localization.md) · [Data Entities](data-entities.md) · [Model deployment](model-deployment.md) · [Testing](testing.md)

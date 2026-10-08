@@ -49,6 +49,22 @@ View metadata supports:
 
 Field references use the declared alias and field name, such as `o.orderDate`. Output sort entries reference output-column names. Designer/change-set validation checks table and field existence, types, grouping, App dependencies, aliases, joins, and protected tables. Runtime compilation quotes identifiers and binds values as parameters.
 
+## Audit fields in Views
+
+Every Table exposes the read-only audit aliases `sys_createdBy`, `sys_createdAt`, `sys_modifiedBy`, and `sys_modifiedAt`. They can be used wherever a View accepts a field reference: output columns, filters, `groupBy`, joins, and, through the output column, `orderBy`. They map to the existing audit columns, so no schema change is needed.
+
+```json
+{
+  "columns": [
+    { "name": "creator", "expression": { "type": "field", "ref": "o.sys_createdBy" } },
+    { "name": "orders", "expression": { "type": "aggregate", "fn": "count" } }
+  ],
+  "groupBy": ["o.sys_createdBy"]
+}
+```
+
+`sys_createdAt` and `sys_modifiedAt` are UTC datetimes, which matters when you compare them with date parameters. Encrypted fields cannot be used in a View; the registry rejects the View with `encrypted field '<ref>' cannot be used in a View`. See [Understand the record lifecycle](record-lifecycle.md).
+
 ## View authorization
 
 For an interactive user, all of these must allow the request:
@@ -127,4 +143,4 @@ Use `chartExtension` to add measures, change `legend` or `stacked`, and override
 
 ## Related topics
 
-[Metadata](metadata.md) · [Security](security.md) · [Web Designer](../user/web-designer.md) · [Power BI](../admin/power-bi-view-api.md)
+[Metadata](metadata.md) · [Record lifecycle](record-lifecycle.md) · [Security](security.md) · [Web Designer](../user/web-designer.md) · [Power BI](../admin/power-bi-view-api.md)

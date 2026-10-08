@@ -65,13 +65,16 @@ kernel.events.on('SALES_Order', 'onInserted', (event) => {
 });
 ```
 
+Hooks and event handlers must be synchronous. A Script that registers an `async` function, or a handler that returns a Promise, fails with `<table>.<hook>: async lifecycle handlers are not supported`; a Script that cannot register is reported as a load error. Put awaited work in an `async` Function instead (see [Record lifecycle](record-lifecycle.md)).
+
 Scripts can register an action with `kernel.actions.set(name, handler)`, but prefer a Function artifact when the action is a public, explicit application operation.
 
 ## Rules and limitations
 
 - Keep Scripts short, deterministic, and testable.
 - Use the authenticated `ctx` supplied to action handlers.
-- Do not use network calls inside database transactions.
+- Do not use network calls inside database transactions, and do not use `async`/`await` in hooks or event handlers.
+- A Script belongs to its App. When the App's licensed ISV Model is read-only, the handlers and actions the Script registered refuse writes even when another App's request triggers them; see [Deploy models and license ISV add-ons](model-deployment.md).
 - Do not rely on accidental registration order; use unique names.
 - Function artifacts are registered after web Scripts. A Function with the same action name can replace a Script-registered action according to kernel behavior.
 - Scripts and Functions are trusted administrative code compiled with `new Function`.
@@ -82,8 +85,8 @@ Restrict Designer access, review every Script change, keep credentials and produ
 
 ## Testing
 
-Test valid and invalid writes, handler order where relevant, rollback after a thrown error, unauthorized access, and the behavior with the Script enabled and disabled. Run the complete verification suite described in [Run tests and debug](testing.md).
+Test valid and invalid writes, a new-record draft that is opened and saved, handler order where relevant, rollback after a thrown error, unauthorized access, and the behavior with the Script enabled and disabled. Run the complete verification suite described in [Run tests and debug](testing.md).
 
 ## Related topics
 
-[Functions and actions](functions.md) · [Hooks and data events](hooks-events.md) · [Security](security.md) · [Extensions](extensions.md)
+[Functions and actions](functions.md) · [Hooks and data events](hooks-events.md) · [Record lifecycle](record-lifecycle.md) · [Security](security.md) · [Extensions](extensions.md)

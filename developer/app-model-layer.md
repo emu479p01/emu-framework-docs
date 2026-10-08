@@ -53,13 +53,23 @@ The App manifest defines the application identity, display information, dependen
 }
 ```
 
-Every App created in v0.1.1.0 starts with zero Models. This includes names such as `erp`, `erp.credit`, and `web`; no App name creates `MiniERPApplication` or another hidden default. Add a Model explicitly before creating an artifact.
+An App may also declare `defaultLocale`, the language of its stored labels (`en` when omitted); see [Localize metadata with Translations](localization.md).
+
+Every App created since v0.1.1.0 starts with zero Models. This includes names such as `erp`, `erp.credit`, and `web`; no App name creates `MiniERPApplication` or another hidden default. Add a Model explicitly before creating an artifact.
 
 Use the App boundary to decide what belongs together, what the application depends on, which users may open or customize it, and how its navigation is filtered. `dependsOn` determines load order and whether a cross-App reference, View, Chart, or Extension is allowed (see [Extensions](extensions.md)).
 
 ## Model
 
 A Model is a named grouping within an App. Use Models to separate coherent areas of an application, such as core sales definitions, reporting definitions, or a customer-specific customization set. A Model can carry its own layer assignment in the App manifest, while individual artifacts may also specify ownership and layer according to the metadata contract.
+
+An `ISV` Model can require an offline license by adding `license: { "vendor": "seller-id" }` to its entry in the App manifest:
+
+```json
+{ "name": "Addon", "label": "Add-on", "layer": "ISV", "license": { "vendor": "seller-id" } }
+```
+
+Only `ISV` Models can declare it, and an installed requirement cannot be removed or changed through ordinary customization. When the license is missing or expired, the App and every App that depends on it become read-only. Whole Models are moved between environments with selected-model packages. See [Deploy models and license ISV add-ons](model-deployment.md).
 
 A Model is not a security boundary. Creating or selecting one never grants App entry, Designer access, or business-object permission.
 
@@ -119,4 +129,4 @@ flowchart LR
 
 ## Related topics
 
-[Application workflow](application-workflow.md) · [Metadata](metadata.md) · [Work with metadata layers](layers.md) · [Extensions](extensions.md) · [Security](security.md)
+[Application workflow](application-workflow.md) · [Metadata](metadata.md) · [Work with metadata layers](layers.md) · [Extensions](extensions.md) · [Localization](localization.md) · [Model deployment](model-deployment.md) · [Security](security.md)

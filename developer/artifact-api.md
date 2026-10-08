@@ -2,7 +2,7 @@
 
 ## Purpose
 
-Create, update, validate, and apply EmuFramework v0.5.0.0 metadata with the exact wire format accepted by the server.
+Create, update, validate, and apply EmuFramework v1.4.0 metadata with the exact wire format accepted by the server.
 
 ## Choose the API
 
@@ -90,6 +90,10 @@ Content-Type: application/json
 
 `layer` is required and must be `SYS`, `ISV`, `LOC`, `DEV`, or `CUS`. A Model is stored inside the App manifest; `model` is not an Artifact `kind`.
 
+An `ISV` Model can also carry `"license": { "vendor": "seller-id" }` to require an offline license. Once a requirement exists, a later request that changes the vendor or moves the Model off `ISV` returns `422` (`Cannot change an installed license requirement`). An App update that drops or alters the requirement returns `422` (`Cannot remove or change license requirement for '<model>'`), and deleting the Model through this API is refused. See [Deploy models and license ISV add-ons](model-deployment.md).
+
+To set the App's language, send `defaultLocale` (a BCP-47 tag) on the `app` Artifact. An invalid tag returns a `422` diagnostic at `/defaultLocale`.
+
 AI tokens can target only existing non-system Apps, so the first App must be created through Web Designer or the authenticated Designer API.
 
 ## Create one Artifact
@@ -99,7 +103,7 @@ Use create-only POST when overwriting an existing name must be impossible:
 ```http
 POST /api/designer/artifacts
 Content-Type: application/json
-Cookie: emu_session=<session>
+Cookie: nf_session=<session>
 ```
 
 The body is one complete Artifact. Success returns HTTP `201`. An existing name returns `409`; schema or registry validation normally returns `422`.
@@ -111,10 +115,25 @@ Use idempotent PUT:
 ```http
 PUT /api/designer/artifacts/{kind}/{name}
 Content-Type: application/json
-Cookie: emu_session=<session>
+Cookie: nf_session=<session>
 ```
 
 The URL's `kind` and `name` are authoritative and replace those values in the body. Send the complete desired Artifact, not a JSON Merge Patch. The entire candidate workspace is revalidated before persistence.
+
+## Kinds added since v0.5.0.0
+
+The Designer API accepts `translation`, `dataEntity`, and `dataEntityExtension` in addition to the earlier kinds, with the same placement rules. Check them against `GET /api/designer/capabilities`, which returns the live Artifact and ChangeSet schemas. Schema diagnostics also report these rules:
+
+| Rule | Diagnostic |
+| --- | --- |
+| `locale` or `defaultLocale` is not a valid tag | `invalid_locale` |
+| A Model other than `ISV` declares `license` | `license_layer` |
+| An enum field is mandatory | `enum_optional` |
+| A read-only field is mandatory | `readonly_optional` |
+| `multiline` or `encrypted` is set on a non-string field | `field_rules` |
+| An encrypted field defines a `default` | `field_rules` |
+
+Related Designer endpoints are `GET /api/designer/translations/diagnostics` for duplicate and stale Translation keys, and `POST /api/designer/reports/validate` with `{ "artifact": <report> }`, which returns `valid`, layout `diagnostics` with `severity` `error` or `warning`, and a `summary` (see [Design paginated Reports](reports.md)). `POST /api/designer/packages/models/:app/export` builds a selected-model package and `POST /api/designer/packages/import/preview` previews any package; both are described in [Deploy models and license ISV add-ons](model-deployment.md).
 
 ## Apply several dependent Artifacts atomically
 
@@ -181,6 +200,8 @@ Content-Type: application/json
 
 Set `confirmHighRisk: true` when the preview contains an executable Artifact or another high-risk diff. A preview belongs to the validating user. If the workspace changes before apply, the server returns `409` and requires a new validation.
 
+Apply revalidates the candidate workspace and then applies it as one unit. When applying the registry or saving the Artifacts fails, runtime registrations (hooks, events, actions) and database changes made during the apply are restored, so a failed apply does not leave a partial runtime.
+
 ## Recommended dependency order
 
 Within one ChangeSet, include every new dependency. The registry sorts base Artifacts before Extensions, but the clearest authoring order is:
@@ -217,7 +238,7 @@ Schema failures include a JSON path in `diagnostics`. Cross-reference failures a
 
 ## Reference
 
-- [Artifact kinds](artifact-types.md) lists required and optional properties for every supported `kind`.
+- [Artifact kinds](artifact-types.md) lists required and optional properties for every supported `kind`, including `translation`, `dataEntity`, and `dataEntityExtension`.
 - [Nested metadata structures](artifact-components.md) defines fields, references, actions, menus, report bands, View expressions, and overrides.
 - [AI REST proposal API](ai-rest-api.md) documents the non-applying Bearer-token workflow.
 

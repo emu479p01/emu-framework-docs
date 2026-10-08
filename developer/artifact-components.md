@@ -12,14 +12,16 @@ Required: `name`, `type`.
 
 | Property | Type | Meaning |
 | --- | --- | --- |
-| `name` | identifier | Field name; cannot be `id`, `createdAt`, `createdBy`, `modifiedAt`, or `modifiedBy`. |
+| `name` | identifier | Field name. System names are reserved case-insensitively: `id`, `createdAt`, `createdBy`, `modifiedAt`, `modifiedBy`, `sys_createdBy`, `sys_createdAt`, `sys_modifiedBy`, and `sys_modifiedAt`. |
 | `type` | enum | `string`, `int`, `real`, `boolean`, `date`, `datetime`, `enum`, or `reference`. |
 | `label` | string | User-facing label. |
-| `mandatory` | boolean | Required business value. Enum and read-only fields cannot be mandatory. |
+| `mandatory` | boolean | Required business value. Enum and read-only fields cannot be mandatory in validated metadata. |
 | `readOnly` | boolean | Generated Forms and REST writes cannot edit it; trusted code may. |
 | `allowEdit` | boolean | Allow edit after creation. |
 | `allowEditOnCreate` | boolean | Allow edit during creation. |
 | `maxLength` | integer ≥ 1 | String length limit. |
+| `multiline` | boolean | Render a string as a multi-line editor and preserve newlines. Only valid on `string` fields. |
+| `encrypted` | boolean | Store a string encrypted at rest. Only valid on `string` fields, and it cannot define a `default`. |
 | `enumName` | identifier | Required semantically when `type` is `enum`; must reference an existing Enum. |
 | `reference` | object | Required semantically when `type` is `reference`. |
 | `default` | scalar or null | String, number, boolean, or null. |
@@ -37,6 +39,10 @@ Required: `name`, `type`.
   }
 }
 ```
+
+### Encrypted fields
+
+An `encrypted` field is encrypted with AES-256-GCM using the installation's secret key, which is the same key file that protects other secrets. Generic APIs return the mask `••••••••` instead of the stored value (or `null` when empty), so a client cannot read the secret back. Sending the mask on update keeps the stored value; sending an empty value or `null` also leaves it unchanged. The mask is rejected as a new value on create. Encrypted fields cannot be filtered, searched, sorted, imported as a key, exported, used in a View or Report, or used as `titleField`, an index column, `filterFields`, a lookup display or filter field, or a `copyFields` source. Turning `encrypted` on or off through a `tableExtension` `fieldOverrides` entry re-encrypts or decrypts the stored values when the schema is applied. Back up the secret key with the databases; without it the values cannot be recovered.
 
 ### Reference settings
 
@@ -143,6 +149,15 @@ Page settings:
 
 The schema accepts a four-number tuple. Runtime type documentation defines the order as `[top, right, bottom, left]` in points.
 
+| Property | Meaning |
+| --- | --- |
+| `size` | `A3` (842 × 1191 pt), `A4` (595 × 842), `A5` (420 × 595), `Letter` (612 × 792), `Legal` (612 × 1008), or `Custom`. Defaults to `A4`. |
+| `orientation` | `portrait` or `landscape`, which swaps width and height. |
+| `width`, `height` | Positive points. Required when `size` is `Custom`. |
+| `margins` | `[top, right, bottom, left]`, non-negative points. Defaults to `[40, 40, 40, 40]`. |
+
+Report-level properties near the page settings are `layoutVersion` (`1` or `2`), `designUnit` (`cm`, `in`, or `px`), and `assets`, an array of `{ id, name, mimeType, dataBase64 }` where `mimeType` is `image/png` or `image/jpeg`. See [Design paginated Reports](reports.md).
+
 A band requires `kind`, `height`, and `elements`:
 
 - `kind`: `header`, `detail`, or `footer`; `pageHeader`/`pageFooter` are legacy-compatible.
@@ -150,7 +165,18 @@ A band requires `kind`, `height`, and `elements`:
 - `layout`: `freeform` or `tablix`.
 - A Tablix is valid only on a Detail band, requires `tablix`, and requires `elements: []`.
 
-A freeform element requires `id`, `type`, `x`, `y`, `width`, and `height`. `type` is `text`, `field`, `image`, `line`, or `rect`; provide `text` for text and `field` for bound fields. Optional `format` and style properties are `fontSize`, `bold`, `italic`, `fontFamily`, `align`, `color`, and `borderWidth`.
+A freeform element requires `id`, `type`, `x`, `y`, `width`, and `height`. `type` is `text`, `field`, `image`, `line`, or `rect`; provide `text` for text, `field` for bound fields, and `image` for images. Optional `format` and `style` properties are `fontSize`, `bold`, `italic`, `fontFamily`, `align`, `color`, `borderWidth`, `borderColor`, and `borderStyle` (`solid`, `dashed`, `dotted`, or `none`). Borders apply to text, field, and rectangle elements.
+
+An `image` object requires `source`:
+
+| Property | Meaning |
+| --- | --- |
+| `source` | `asset` (an embedded design image) or `attachment` (an image attached to the current record). |
+| `assetId` | The `id` of a Report `assets` entry; required for `asset`. |
+| `attachmentIdField` | A field of the current record that holds an attachment ID; for `attachment`. |
+| `attachmentName` | Alternatively, the display name of an image attachment on the current record (the newest match is used). One of the two is required for `attachment`. |
+| `fit` | `stretch`, `contain` (default), `cover`, or `original`. |
+| `horizontalAlign`, `verticalAlign` | `left`, `center`, `right` and `top`, `middle`, `bottom`. |
 
 A Tablix requires at least one column. Each column requires `field`; optional properties are `label`, positive `width`, `align`, and `format`. Optional Tablix properties are positive `headerHeight`, positive `rowHeight`, `headerStyle`, `rowStyle`, and `border`.
 
@@ -182,13 +208,25 @@ Required: `field`. Optional: `label`, `color`. `field` must be an output column 
 
 ## Extension overrides
 
-- `fieldOverrides`: `field` plus optional `label`, `readOnly`, `allowEdit`, `allowEditOnCreate`.
+- `fieldOverrides`: `field` plus optional `label`, `readOnly`, `allowEdit`, `allowEditOnCreate`, `multiline`, `encrypted`.
 - `elementOverrides`: `targetId` plus optional `label`, `hidden`, `order`.
 - `lineOverrides`: `targetId` plus optional `label`, `hidden`, `order`, `fields`, `aggregates`, `actions`. It cannot change the inherited relationship identity (`table`/`refField`).
 - `itemOverrides`: `targetId` plus optional `label`, icon, visibility, order, or target.
 - `valueOverrides`: `name` and required replacement `label`.
 - `columnOverrides`: `column` and required replacement `label`.
 - `measureOverrides`: `field` plus optional `label` and `color`.
+
+## Translation and Data Entity structures
+
+A Translation's `resources` is an object whose keys are resource keys and whose values are strings; see [Localize metadata with Translations](localization.md). A Data Entity line requires `name`, `table`, `parentReference`, non-empty `fields`, and non-empty `lineKeys`, and a Data Entity Extension `lineExtensions` item requires `name` and non-empty `fields`. See [Define Data Entities](data-entities.md).
+
+## Function image input
+
+`imageInput` requires `table` and `recordIdArgument` and accepts `multiple`. The table must be a business table (not `FW_*`), and `recordIdArgument` cannot be `attachmentIds`, `__proto__`, `constructor`, or `prototype`. See [Develop Functions and actions](functions.md#image-input).
+
+## Model license
+
+A Model entry in the App manifest accepts `license` with a required `vendor` string and no other properties. See [Deploy models and license ISV add-ons](model-deployment.md).
 
 ## Related topics
 

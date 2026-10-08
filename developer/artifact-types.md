@@ -19,23 +19,26 @@ Common non-App properties are:
 
 | Kind | Kind-specific required properties | Main optional properties |
 | --- | --- | --- |
-| `app` | `name` | `label`, `icon`, `dependsOn`, `models` |
+| `app` | `name` | `label`, `defaultLocale`, `icon`, `dependsOn`, `models` |
 | `table` | `fields` | `label`, `titleField`, `indexes` |
 | `enum` | `values` | `label` |
+| `translation` | `locale`, `resources` | none beyond common |
+| `dataEntity` | `rootTable`, `businessKey`, `fields` | `label`, `lines`, `archiveEligible`, `businessDateField` |
 | `form` | `table` | `label`, `actions`, `listFields`, `filterFields`, `groups`, `charts`, `lines` |
 | `menu` | `items` | `label` |
 | `privilege` | none beyond common | `tablePermissions`, `forms`, `functions`, `reports`, `views` |
 | `duty` | `privileges` | `label` |
 | `role` | none beyond common | `label`, `duties`, `privileges` |
 | `script` | `code` | `label` |
-| `function` | `code` | `label`, `executionMode`, `privileges` |
-| `report` | `dataSource`, `bands` | `label`, `defaultFont`, `privileges`, `page`, `lineSources`, `parameters` |
+| `function` | `code` | `label`, `executionMode`, `imageInput`, `privileges` |
+| `report` | `dataSource`, `bands` | `label`, `defaultFont`, `privileges`, `layoutVersion`, `designUnit`, `assets`, `page`, `lineSources`, `parameters` |
 | `view` | `source`, non-empty `columns` | `label`, `joins`, `parameters`, `filters`, `groupBy`, `orderBy` |
 | `chart` | `type`, `view`, non-empty `measures` | `label`, `dimension`, `legend`, `stacked` |
 | `tableExtension` | `table` | `fields`, `indexes`, `fieldOverrides` |
 | `formExtension` | `form` | `listFields`, `filterFields`, `groups`, `charts`, `actions`, `lines`, `lineOverrides`, `elementOverrides` |
 | `menuExtension` | `menu` | `items`, `insertions`, `itemOverrides` |
 | `enumExtension` | `enum`, `values` | `valueOverrides` |
+| `dataEntityExtension` | `dataEntity` | `fields`, `lines`, `lineExtensions` |
 | `privilegeExtension` | `privilege` | permission collections |
 | `dutyExtension` | `duty` | `privileges` |
 | `roleExtension` | `role` | `duties`, `privileges` |
@@ -44,21 +47,25 @@ Common non-App properties are:
 | `viewExtension` | `view` | `joins`, `columns`, `filters`, `orderBy`, `columnOverrides` |
 | `chartExtension` | `chart` | `measures`, `label`, `legend`, `stacked`, `measureOverrides` |
 
-There is no `reportExtension` kind in v0.5.0.0.
+There is no `reportExtension` or `translationExtension` kind in v1.4.0. To change a Report, replace it with a higher-Layer `report`; to change wording, add a higher-Layer `translation`. Kinds `translation`, `dataEntity`, and `dataEntityExtension` are new since v0.5.0.0.
 
 ## App
 
 `app` requires only `kind` and `name`. `models` may be empty. `icon` must come from the safe icon catalog. Every `dependsOn` App must be loaded when cross-App Artifacts are resolved.
+
+`defaultLocale` is the BCP-47 language in which the App's stored labels are written (`en` when omitted). It is canonicalized, so `th-th` is stored as `th-TH`; see [Localize metadata with Translations](localization.md). A Model entry may carry `license: { "vendor": "seller-id" }` to require an offline ISV license. Only an `ISV` Model can do so, and an installed requirement cannot be removed through ordinary edits; see [Deploy models and license ISV add-ons](model-deployment.md).
 
 ```json
 {
   "kind": "app",
   "name": "sales",
   "label": "Sales",
+  "defaultLocale": "en",
   "icon": "app",
   "dependsOn": [],
   "models": [
     { "name": "Core", "label": "Core", "layer": "ISV" },
+    { "name": "Addon", "label": "Add-on", "layer": "ISV", "license": { "vendor": "seller-id" } },
     { "name": "Customizations", "label": "Customizations", "layer": "CUS" }
   ]
 }
@@ -68,7 +75,9 @@ Use the dedicated Model endpoint when adding or changing one Model. Creating a n
 
 ## Table
 
-`fields` is required and may be empty structurally. `titleField` and every indexed field must exist. Field names are unique and cannot use framework system fields. Enum and reference targets must exist.
+`fields` is required and may be empty structurally. `titleField` and every indexed field must exist. Field names are unique and cannot use framework system fields, which are reserved case-insensitively: `id`, `createdAt`, `createdBy`, `modifiedAt`, `modifiedBy`, and the audit aliases `sys_createdBy`, `sys_createdAt`, `sys_modifiedBy`, and `sys_modifiedAt`. Enum and reference targets must exist.
+
+A string field can set `multiline` for a multi-line editor or `encrypted` to store its value encrypted and expose only a mask through generic APIs. An encrypted field cannot be the `titleField`, an index column, a Form `filterFields` entry, a lookup display or filter field, a `copyFields` source, a View column, or a Report field. See [Nested metadata structures](artifact-components.md#table-field).
 
 ```json
 {
@@ -81,7 +90,9 @@ Use the dedicated Model endpoint when adding or changing one Model. Creating a n
   "titleField": "orderNo",
   "fields": [
     { "name": "orderNo", "type": "string", "mandatory": true, "maxLength": 30 },
-    { "name": "amount", "type": "real", "default": 0 }
+    { "name": "amount", "type": "real", "default": 0 },
+    { "name": "remarks", "type": "string", "multiline": true },
+    { "name": "apiKey", "type": "string", "encrypted": true }
   ],
   "indexes": [
     { "name": "SALES_Order_OrderNoIdx", "fields": ["orderNo"], "unique": true }
@@ -109,6 +120,57 @@ Schema synchronization is additive. Removing metadata preserves physical data; c
   ]
 }
 ```
+
+## Translation
+
+`locale` and `resources` are required. `resources` maps resource keys to translated labels and may be empty. The locale is canonicalized when the Artifact is saved.
+
+```json
+{
+  "kind": "translation",
+  "name": "SALES_Thai",
+  "app": "sales",
+  "model": "Core",
+  "layer": "ISV",
+  "locale": "th",
+  "resources": {
+    "form.SALES_OrderForm.label": "ใบสั่งขาย",
+    "table.SALES_Order.field.amount.label": "จำนวนเงิน"
+  }
+}
+```
+
+Keys use fixed conventions and keys that start with `ui.` are reserved for the framework. See [Localize metadata with Translations](localization.md) for the key table, fallback order, and Layer rules.
+
+## Data Entity
+
+`rootTable`, a non-empty `businessKey`, and a non-empty `fields` are required. `lines` describe child tables; each line requires `name`, `table`, `parentReference`, `fields`, and `lineKeys`. `archiveEligible` requires `businessDateField`.
+
+```json
+{
+  "kind": "dataEntity",
+  "name": "SALES_OrderEntity",
+  "app": "sales",
+  "model": "Core",
+  "layer": "ISV",
+  "label": "Sales orders",
+  "rootTable": "SALES_Order",
+  "businessKey": ["orderNo"],
+  "fields": ["orderNo", "amount"],
+  "lines": [
+    {
+      "name": "Lines",
+      "table": "SALES_OrderLine",
+      "parentReference": "orderId",
+      "fields": ["lineNo", "quantity"],
+      "lineKeys": ["lineNo"]
+    }
+  ],
+  "archiveEligible": false
+}
+```
+
+See [Define Data Entities](data-entities.md) for import, export, and archive behavior.
 
 ## Form
 
@@ -246,11 +308,28 @@ See [Develop Scripts](scripts.md) for the execution contract.
 }
 ```
 
-Async Functions may await bounded HTTP/email services but must use explicit short transactions for database writes.
+Async Functions may await bounded HTTP/email services but must use explicit short transactions for database writes. Async work belongs here rather than in hooks and data events, which must be synchronous (see [Record lifecycle](record-lifecycle.md)).
+
+`imageInput` makes the Function ask the user for JPEG, PNG, or WebP images that are attached to a record before it runs. It takes the business `table`, the `recordIdArgument` that carries the record ID, and an optional `multiple` flag.
+
+```json
+{
+  "kind": "function",
+  "name": "SALES_ScanReceipt",
+  "app": "sales",
+  "model": "Core",
+  "layer": "ISV",
+  "label": "Scan receipt",
+  "imageInput": { "table": "SALES_Order", "recordIdArgument": "recordId", "multiple": true },
+  "code": "return { ok: true, count: args.attachmentIds.length };"
+}
+```
+
+See [Develop Functions and actions](functions.md#image-input).
 
 ## Report
 
-`dataSource` and `bands` are required. The source Table, field elements, parameters, Line source relationships, and Tablix columns are validated.
+`dataSource` and `bands` are required. The source Table, field elements, parameters, Line source relationships, and Tablix columns are validated. Encrypted fields cannot be rendered or used as parameters.
 
 ```json
 {
@@ -262,6 +341,8 @@ Async Functions may await bounded HTTP/email services but must use explicit shor
   "label": "Order list",
   "dataSource": "SALES_Order",
   "defaultFont": "Noto Sans Thai",
+  "layoutVersion": 2,
+  "designUnit": "cm",
   "page": { "size": "A4", "orientation": "portrait", "margins": [40, 40, 40, 40] },
   "bands": [
     {
@@ -280,7 +361,7 @@ Async Functions may await bounded HTTP/email services but must use explicit shor
 }
 ```
 
-Tablix is allowed only on Detail bands. See [Design paginated Reports](reports.md).
+Page `size` is `A3`, `A4`, `A5`, `Letter`, `Legal`, or `Custom`; `Custom` requires positive `width` and `height` in points. `layoutVersion` `2` turns printable-area problems into errors, and `designUnit` (`cm`, `in`, or `px`) only changes how the Designer displays values, because geometry is always stored in points. `assets` embeds PNG or JPEG images for `image` elements. Tablix is allowed only on Detail bands. See [Design paginated Reports](reports.md).
 
 ## View
 
@@ -536,6 +617,25 @@ Target: `chart`. Add measures, set `legend`/`stacked`/`label`, or override an ex
 }
 ```
 
+## Data Entity Extension
+
+Target: `dataEntity`. Deltas: `fields`, `lines`, `lineExtensions`. Each collection that is present must be non-empty. The extension cannot change the root table, business key, existing line relationships, or archive settings.
+
+```json
+{
+  "kind": "dataEntityExtension",
+  "name": "SALES_Customizations_SALES_OrderEntity_Extension",
+  "app": "sales",
+  "model": "Customizations",
+  "layer": "CUS",
+  "dataEntity": "SALES_OrderEntity",
+  "fields": ["customerReference"],
+  "lineExtensions": [{ "name": "Lines", "fields": ["remark"] }]
+}
+```
+
+The fields must already exist on the Table, usually through a `tableExtension`. See [Define Data Entities](data-entities.md#extend-a-data-entity).
+
 ## Validation checklist
 
 Before applying any Artifact:
@@ -550,4 +650,4 @@ Before applying any Artifact:
 
 ## Related topics
 
-[Artifact API](artifact-api.md) · [Nested structures](artifact-components.md) · [Metadata](metadata.md) · [Extensions](extensions.md) · [AI REST API](ai-rest-api.md)
+[Artifact API](artifact-api.md) · [Nested structures](artifact-components.md) · [Metadata](metadata.md) · [Extensions](extensions.md) · [Localization](localization.md) · [Data Entities](data-entities.md) · [AI REST API](ai-rest-api.md)

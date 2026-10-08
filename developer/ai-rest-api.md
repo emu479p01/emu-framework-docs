@@ -75,6 +75,14 @@ Validation returns HTTP `422` for an invalid ChangeSet. Approval revalidates aga
 
 Scripts and Functions are permitted in proposals because they are reviewed executable Artifacts. Treat them as code: inspect credentials, network access, transaction boundaries, and authorization before approval.
 
+## Review and remove proposals
+
+Reviewers use the Designer session endpoints `GET /api/designer/ai-proposals`, `POST /api/designer/ai-proposals/:id/approve`, and `POST /api/designer/ai-proposals/:id/reject`. Since v1.0.1 a reviewer can also delete a proposal that is no longer pending with `DELETE /api/designer/ai-proposals/:id`. This removes the entry from the Inbox only; applied metadata and audit records stay. A pending proposal returns `409` (`Review the pending proposal before deleting it`), an unknown id returns `404`, and a reviewer without Customize permission for every affected App receives `403`. Deletion is recorded as `proposal.delete` in the audit.
+
+## Artifact kinds and fields
+
+The Artifact schema served by `GET /api/v1/ai/schemas/artifact` includes the kinds added since v0.5.0.0: `translation`, `dataEntity`, and `dataEntityExtension`, plus Field `multiline` and `encrypted`, Function `imageInput`, and the richer Report page, unit, asset, image, and border properties. Always fetch the schema rather than relying on this page. Treat any `encrypted` field, Function, or Script in a proposal as security-sensitive during review.
+
 ## Auditing and rotation
 
 Token creation, revocation, validation, proposal creation, approval, and rejection are recorded in `designer.db`. Revoke a token immediately if its secret may have leaked; create a replacement rather than trying to recover the old secret.

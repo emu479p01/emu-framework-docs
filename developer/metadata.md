@@ -26,7 +26,7 @@ flowchart LR
 
 ## Concepts
 
-Metadata describes Apps, Models, tables, fields, enums, Forms, menus, Privileges, Duties, Roles, Reports, Views, Charts, Scripts, and Functions. `name` is a stable identifier; `label` is user-facing text. Supported base kinds include `app`, `enum`, `table`, `form`, `menu`, `privilege`, `duty`, `role`, `script`, `function`, `report`, `view`, and `chart`.
+Metadata describes Apps, Models, tables, fields, enums, Forms, menus, Privileges, Duties, Roles, Reports, Views, Charts, Scripts, Functions, Translations, and Data Entities. `name` is a stable identifier; `label` is user-facing text. Supported base kinds include `app`, `enum`, `table`, `form`, `menu`, `privilege`, `duty`, `role`, `script`, `function`, `report`, `translation`, `dataEntity`, `view`, and `chart`. [Translations](localization.md) provide per-locale labels, and [Data Entities](data-entities.md) describe documents for spreadsheet exchange and archiving.
 
 Metadata is resolved through ordered layers: `SYS < ISV < LOC < DEV < CUS`. Base artifacts at a higher layer override lower-layer artifacts with the same logical identity; Extensions accumulate into their target. See [Work with metadata layers](layers.md) for ownership and precedence rules.
 
@@ -36,7 +36,7 @@ Prefer Web Designer or a reviewed AI REST proposal over repetitive handwritten p
 
 ## Schema and database rules
 
-Schema synchronization is additive: adding tables, fields, and indexes is supported. Removing or changing existing structures needs an explicit migration and backup plan. Do not declare framework audit fields (`id`, `createdAt`, `createdBy`, `modifiedAt`, `modifiedBy`) as application fields. Enum fields and fields with `readOnly: true` must not also set `mandatory: true`.
+Schema synchronization is additive: adding tables, fields, and indexes is supported. Removing or changing existing structures needs an explicit migration and backup plan. Do not declare framework system fields as application fields. The reserved names are `id`, `createdAt`, `createdBy`, `modifiedAt`, `modifiedBy`, and the virtual aliases `sys_createdBy`, `sys_createdAt`, `sys_modifiedBy`, and `sys_modifiedAt`, compared case-insensitively. If a stored table already has a physical column that collides with an alias, schema synchronization stops before it changes anything. See [Understand the record lifecycle](record-lifecycle.md). Enum fields and fields with `readOnly: true` must not also set `mandatory: true`. String fields can set `multiline` and `encrypted`; an encrypted field cannot define a default.
 
 ## Procedure
 
@@ -100,12 +100,23 @@ A change set is the right tool when creating a Table + Form + Menu + Security gr
 
 ### Supported object kinds
 
-`app`, `table`, `enum`, `form`, `menu`, `script`, `function`, `report`, `view`, `chart`, `privilege`, `duty`, `role`, `tableExtension`, `enumExtension`, `formExtension`, `menuExtension`, `privilegeExtension`, `dutyExtension`, `roleExtension`, `scriptExtension`, `viewExtension`, `chartExtension`, `functionExtension`
+`app`, `table`, `enum`, `form`, `menu`, `script`, `function`, `report`, `translation`, `dataEntity`, `view`, `chart`, `privilege`, `duty`, `role`, `tableExtension`, `enumExtension`, `formExtension`, `menuExtension`, `privilegeExtension`, `dutyExtension`, `roleExtension`, `scriptExtension`, `viewExtension`, `chartExtension`, `functionExtension`, `dataEntityExtension`
 
 An App is created with `models: []`. Add a Model through Designer before creating other Artifacts. System metadata appears only to a System Administrator in the **Framework — Read-only** scope and is rejected by every mutation and packaging endpoint.
 
 Every API channel validates schema, naming, app/model/layer, dependencies, cross-references, and permissions before saving.
 
+## Metadata delivered to the client
+
+`GET /api/metadata` returns the metadata the signed-in user may use, already localized for the user's locale. It is not the Designer contract. Notable properties are:
+
+- `tables` includes the system fields (`id`, the audit columns, and the audit aliases) in each Table's `fields`.
+- `forms` contain only the actions the user is authorized to run. A form or line action whose Function, Report, Picker table, or Privilege is not granted is omitted, and a direct call to its endpoint returns `403`. Do not depend on a disabled button; the server filters the list.
+- `functionInputs` lists `name`, `label`, and `imageInput` for each Function the user may run. Function code is never sent.
+- `dataEntities` lists the entities whose root and line tables the user can read.
+- `locale`, `availableLocales`, `uiMessages`, and `apps[].defaultLocale` / `apps[].availableLocales` describe localization; see [Localize metadata with Translations](localization.md).
+- `branding.title` carries the product name set by the `EMU_APP_TITLE` environment variable (default `EmuFramework`), and `licenseNotices` reports expiring or blocking ISV licenses.
+
 ## Related topics
 
-[Artifact API](artifact-api.md) · [Artifact kinds](artifact-types.md) · [Nested structures](artifact-components.md) · [AI REST API](ai-rest-api.md) · [Security](security.md) · [Web Designer](../user/web-designer.md)
+[Artifact API](artifact-api.md) · [Artifact kinds](artifact-types.md) · [Nested structures](artifact-components.md) · [Localization](localization.md) · [Data Entities](data-entities.md) · [Record lifecycle](record-lifecycle.md) · [AI REST API](ai-rest-api.md) · [Security](security.md) · [Web Designer](../user/web-designer.md)
